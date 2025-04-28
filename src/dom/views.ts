@@ -16,13 +16,13 @@ export class ViewportInfo {
   documentWidth: number;
 
   constructor(
-    width: number = 1024,
-    height: number = 768,
-    scrollX: number = 0,
-    scrollY: number = 0,
-    devicePixelRatio: number = 1,
-    documentHeight: number = 1024,
-    documentWidth: number = 768
+    width = 1024,
+    height = 768,
+    scrollX = 0,
+    scrollY = 0,
+    devicePixelRatio = 1,
+    documentHeight = 1024,
+    documentWidth = 768
   ) {
     this.width = width;
     this.height = height;
@@ -41,7 +41,7 @@ export class ViewportInfo {
       scrollY: this.scrollY,
       devicePixelRatio: this.devicePixelRatio,
       documentHeight: this.documentHeight,
-      documentWidth: this.documentWidth
+      documentWidth: this.documentWidth,
     };
   }
 }
@@ -53,7 +53,7 @@ export abstract class DOMBaseNode {
   isVisible: boolean;
   parent: DOMElementNode | null;
 
-  constructor(isVisible: boolean = false, parent: DOMElementNode | null = null) {
+  constructor(isVisible = false, parent: DOMElementNode | null = null) {
     this.isVisible = isVisible;
     this.parent = parent;
   }
@@ -67,7 +67,11 @@ export abstract class DOMBaseNode {
 export class DOMTextNode extends DOMBaseNode {
   text: string;
 
-  constructor(text: string, isVisible: boolean = false, parent: DOMElementNode | null = null) {
+  constructor(
+    text: string,
+    isVisible = false,
+    parent: DOMElementNode | null = null
+  ) {
     super(isVisible, parent);
     this.text = text;
   }
@@ -104,10 +108,10 @@ export class DOMTextNode extends DOMBaseNode {
 
   toDict(): Record<string, any> {
     return {
-      type: 'TEXT_NODE',
+      type: "TEXT_NODE",
       text: this.text,
       isVisible: this.isVisible,
-      parent: this.parent?.toDict()
+      parent: this.parent?.toDict(),
     };
   }
 }
@@ -126,24 +130,44 @@ export class DOMElementNode extends DOMBaseNode {
   hasShadowRoot: boolean;
   highlightIndex: number | undefined;
   viewportInfo: ViewportInfo | undefined;
-  pageCoordinates: { x: number; y: number; width: number; height: number } | null;
-  viewportCoordinates: { x: number; y: number; width: number; height: number } | null;
+  pageCoordinates: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null;
+  viewportCoordinates: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null;
 
   constructor(
     tag: string,
     xpath: string,
     attributes: Record<string, string> = {},
     children: Array<DOMElementNode | DOMTextNode> = [],
-    isVisible: boolean = false,
-    isInteractive: boolean = false,
-    isTopElement: boolean = false,
-    isInViewport: boolean = false,
-    hasShadowRoot: boolean = false,
+    isVisible = false,
+    isInteractive = false,
+    isTopElement = false,
+    isInViewport = false,
+    hasShadowRoot = false,
     highlightIndex?: number,
     parent: DOMElementNode | null = null,
     viewportInfo?: ViewportInfo,
-    pageCoordinates: { x: number; y: number; width: number; height: number } | null = null,
-    viewportCoordinates: { x: number; y: number; width: number; height: number } | null = null
+    pageCoordinates: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    } | null = null,
+    viewportCoordinates: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    } | null = null
   ) {
     super(isVisible, parent);
     this.tagName = tag.toLowerCase();
@@ -164,12 +188,12 @@ export class DOMElementNode extends DOMBaseNode {
    * Get the text content of the node
    */
   getTextContent(): string {
-    let text = '';
+    let text = "";
     for (const child of this.children) {
       if (child instanceof DOMTextNode) {
-        text += child.text + ' ';
+        text += child.text + " ";
       } else if (child instanceof DOMElementNode) {
-        text += child.getTextContent() + ' ';
+        text += child.getTextContent() + " ";
       }
     }
     return text.trim();
@@ -179,53 +203,62 @@ export class DOMElementNode extends DOMBaseNode {
    * Get the ID attribute of the node
    */
   getId(): string | null {
-    return this.attributes['id'] || null;
+    return this.attributes["id"] || null;
   }
 
   /**
    * Get the class attribute of the node
    */
   getClass(): string | null {
-    return this.attributes['class'] || null;
+    return this.attributes["class"] || null;
   }
 
   /**
    * Check if the node is clickable
    */
   isClickable(): boolean {
-    return this.isInteractive && this.isVisible && this.isTopElement && this.isInViewport;
+    return (
+      this.isInteractive &&
+      this.isVisible &&
+      this.isTopElement &&
+      this.isInViewport
+    );
   }
 
   /**
    * Check if the node is editable
    */
   isEditable(): boolean {
-    const editableTags = ['input', 'textarea', 'select'];
-    const contentEditable = this.attributes['contenteditable'] === 'true';
-    return (editableTags.includes(this.tagName) || contentEditable) && this.isVisible;
+    const editableTags = ["input", "textarea", "select"];
+    const contentEditable = this.attributes["contenteditable"] === "true";
+    return (
+      (editableTags.includes(this.tagName) || contentEditable) && this.isVisible
+    );
   }
-  
 
-  
   /**
    * Get all text until the next clickable element
    * This is used in the clickableElementsToString method
    * @param maxDepth Maximum depth to search for text
    * @returns All text until the next clickable element
    */
-  getAllTextTillNextClickableElement(maxDepth: number = -1): string {
+  getAllTextTillNextClickableElement(maxDepth = -1): string {
     const textParts: string[] = [];
-    
+
     const collectText = (node: DOMBaseNode, currentDepth: number): void => {
       if (maxDepth !== -1 && currentDepth > maxDepth) {
         return;
       }
-      
+
       // Skip this branch if we hit a highlighted element (except for the current node)
-      if (node instanceof DOMElementNode && node !== this && node.highlightIndex !== undefined) {
+      if (
+        node instanceof DOMElementNode &&
+        node !== this &&
+        node.highlightIndex !== undefined
+      ) {
         return;
       }
-      
+
       if (node instanceof DOMTextNode) {
         textParts.push(node.text);
       } else if (node instanceof DOMElementNode) {
@@ -234,11 +267,11 @@ export class DOMElementNode extends DOMBaseNode {
         }
       }
     };
-    
+
     collectText(this, 0);
-    return textParts.join('\n').trim();
+    return textParts.join("\n").trim();
   }
-  
+
   /**
    * Convert the DOM tree to a string representation of clickable elements
    * This exactly matches the Python implementation's clickable_elements_to_string method
@@ -247,40 +280,43 @@ export class DOMElementNode extends DOMBaseNode {
    */
   clickableElementsToString(includeAttributes: string[] | null = null): string {
     const formattedText: string[] = [];
-    
+
     const processNode = (node: DOMBaseNode, depth: number): void => {
       if (node instanceof DOMElementNode) {
         // Add element with highlight_index
         if (node.highlightIndex !== undefined) {
-          let attributesStr = '';
+          let attributesStr = "";
           // Use get_all_text_till_next_clickable_element() to match Python exactly
           const text = node.getAllTextTillNextClickableElement();
-          
+
           if (includeAttributes) {
             // This exactly matches the Python implementation's attribute filtering logic
             const attributes = Array.from(
               new Set(
                 Object.entries(node.attributes)
-                  .filter(([key, value]) => includeAttributes.includes(key) && value !== node.tagName)
+                  .filter(
+                    ([key, value]) =>
+                      includeAttributes.includes(key) && value !== node.tagName
+                  )
                   .map(([_, value]) => String(value))
               )
             );
-            
+
             // Remove text from attributes if it matches to avoid duplication
             if (text && attributes.includes(text)) {
               attributes.splice(attributes.indexOf(text), 1);
             }
-            
-            attributesStr = attributes.join(';');
+
+            attributesStr = attributes.join(";");
           }
-          
+
           // Format the line exactly as in Python
           let line = `[${node.highlightIndex}]<${node.tagName} `;
-          
+
           if (attributesStr) {
             line += `${attributesStr}`;
           }
-          
+
           if (text) {
             if (attributesStr) {
               line += `>${text}`;
@@ -288,11 +324,11 @@ export class DOMElementNode extends DOMBaseNode {
               line += `${text}`;
             }
           }
-          
-          line += '/>';
+
+          line += "/>";
           formattedText.push(line);
         }
-        
+
         // Process children regardless
         for (const child of node.children) {
           processNode(child, depth + 1);
@@ -305,9 +341,9 @@ export class DOMElementNode extends DOMBaseNode {
         }
       }
     };
-    
+
     processNode(this, 0);
-    return formattedText.join('\n');
+    return formattedText.join("\n");
   }
 
   toDict(): Record<string, any> {
@@ -315,7 +351,7 @@ export class DOMElementNode extends DOMBaseNode {
       tag: this.tagName,
       xpath: this.xpath,
       attributes: this.attributes,
-      children: this.children.map(child => child.toDict()),
+      children: this.children.map((child) => child.toDict()),
       isVisible: this.isVisible,
       isInteractive: this.isInteractive,
       isTopElement: this.isTopElement,
@@ -323,7 +359,7 @@ export class DOMElementNode extends DOMBaseNode {
       hasShadowRoot: this.hasShadowRoot,
       highlightIndex: this.highlightIndex,
       viewportInfo: this.viewportInfo?.toDict(),
-      textContent: this.getTextContent()
+      textContent: this.getTextContent(),
     };
   }
 }
@@ -337,15 +373,17 @@ export class DOMHistoryElement {
   textContent: string;
   cssSelector: string;
   xpath: string;
-  boundingBox: { x: number; y: number; width: number; height: number; } | undefined;
+  boundingBox:
+    | { x: number; y: number; width: number; height: number }
+    | undefined;
 
   constructor(
     tag: string,
     attributes: Record<string, string>,
     textContent: string,
-    cssSelector: string = '',
-    xpath: string = '',
-    boundingBox?: { x: number; y: number; width: number; height: number; }
+    cssSelector = "",
+    xpath = "",
+    boundingBox?: { x: number; y: number; width: number; height: number }
   ) {
     this.tag = tag;
     this.attributes = attributes;
@@ -362,7 +400,7 @@ export class DOMHistoryElement {
       textContent: this.textContent,
       cssSelector: this.cssSelector,
       xpath: this.xpath,
-      boundingBox: this.boundingBox
+      boundingBox: this.boundingBox,
     };
   }
 }
@@ -382,8 +420,12 @@ export class DOMState {
   rootElement: DOMElementNode;
   selectorMap: SelectorMap;
   elementTree?: DOMElementNode;
-  
-  constructor(rootElement: DOMElementNode, selectorMap: SelectorMap, elementTree?: DOMElementNode) {
+
+  constructor(
+    rootElement: DOMElementNode,
+    selectorMap: SelectorMap,
+    elementTree?: DOMElementNode
+  ) {
     this.rootElement = rootElement;
     this.selectorMap = selectorMap;
     if (elementTree !== undefined) {
@@ -393,19 +435,22 @@ export class DOMState {
       this.elementTree = rootElement;
     }
   }
-  
+
   toDict(): Record<string, any> {
     const result: Record<string, any> = {
       rootElement: this.rootElement.toDict(),
       selectorMap: Object.fromEntries(
-        Object.entries(this.selectorMap).map(([key, value]) => [key, value.toDict()])
-      )
+        Object.entries(this.selectorMap).map(([key, value]) => [
+          key,
+          value.toDict(),
+        ])
+      ),
     };
-    
+
     if (this.elementTree !== undefined) {
-      result['elementTree'] = this.elementTree;
+      result["elementTree"] = this.elementTree;
     }
-    
+
     return result;
   }
 }

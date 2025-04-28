@@ -1,7 +1,7 @@
 /**
  * Simple utility to estimate token count for a string.
  * This is a rough approximation - for production use, consider using a proper tokenizer.
- * 
+ *
  * @param text The text to count tokens for
  * @returns Estimated token count
  */

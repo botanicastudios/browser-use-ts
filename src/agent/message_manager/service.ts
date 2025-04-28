@@ -1,18 +1,24 @@
-import { AIMessage, BaseMessage, HumanMessage, SystemMessage, ToolMessage } from '@langchain/core/messages';
-import { ActionResult, AgentOutput, AgentStepInfo } from '../views';
-import { MessageMetadata, MessageManagerState, ToolCall } from './views';
-import { AgentMessagePrompt } from '../prompts';
-import { BrowserState } from '../../browser/views';
+import {
+  AIMessage,
+  BaseMessage,
+  HumanMessage,
+  SystemMessage,
+  ToolMessage,
+} from "@langchain/core/messages";
+import { ActionResult, AgentOutput, AgentStepInfo } from "../views";
+import { MessageMetadata, MessageManagerState, ToolCall } from "./views";
+import { AgentMessagePrompt } from "../prompts";
+import { BrowserState } from "../../browser/views";
 
 export class MessageManagerSettings {
-  maxInputTokens: number = 128000;
-  estimatedCharactersPerToken: number = 3;
-  imageTokens: number = 800;
+  maxInputTokens = 128000;
+  estimatedCharactersPerToken = 3;
+  imageTokens = 800;
   includeAttributes: string[] = [];
   messageContext: string | null = null;
   sensitiveData: Record<string, string> | null = null;
   availableFilePaths: string[] | null = null;
-  
+
   /**
    * Constructor to initialize settings
    * This matches the Python implementation's parameter order
@@ -25,10 +31,12 @@ export class MessageManagerSettings {
     availableFilePaths?: string[] | null
   ) {
     if (maxInputTokens !== undefined) this.maxInputTokens = maxInputTokens;
-    if (includeAttributes !== undefined) this.includeAttributes = includeAttributes;
+    if (includeAttributes !== undefined)
+      this.includeAttributes = includeAttributes;
     if (messageContext !== undefined) this.messageContext = messageContext;
     if (sensitiveData !== undefined) this.sensitiveData = sensitiveData;
-    if (availableFilePaths !== undefined) this.availableFilePaths = availableFilePaths;
+    if (availableFilePaths !== undefined)
+      this.availableFilePaths = availableFilePaths;
   }
 }
 
@@ -62,7 +70,9 @@ export class MessageManager {
     this._addMessageWithTokens(this.systemPrompt);
 
     if (this.settings.messageContext) {
-      const contextMessage = new HumanMessage('Context for the task' + this.settings.messageContext);
+      const contextMessage = new HumanMessage(
+        "Context for the task" + this.settings.messageContext
+      );
       this._addMessageWithTokens(contextMessage);
     }
 
@@ -72,42 +82,50 @@ export class MessageManager {
     this._addMessageWithTokens(taskMessage);
 
     if (this.settings.sensitiveData) {
-      const info = `Here are placeholders for sensitve data: ${Object.keys(this.settings.sensitiveData)}`;
-      const infoMessage = new HumanMessage(info + 'To use them, write <secret>the placeholder name</secret>');
+      const info = `Here are placeholders for sensitve data: ${Object.keys(
+        this.settings.sensitiveData
+      )}`;
+      const infoMessage = new HumanMessage(
+        info + "To use them, write <secret>the placeholder name</secret>"
+      );
       this._addMessageWithTokens(infoMessage);
     }
 
-    const placeholderMessage = new HumanMessage('Example output:');
+    const placeholderMessage = new HumanMessage("Example output:");
     this._addMessageWithTokens(placeholderMessage);
 
     const toolCalls: ToolCall[] = [
       {
-        name: 'AgentOutput',
+        name: "AgentOutput",
         args: {
           current_state: {
-            evaluation_previous_goal: 'Success - I opend the first page',
-            memory: 'Starting with the new task. I have completed 1/10 steps',
-            next_goal: 'Click on company a',
+            evaluation_previous_goal: "Success - I opend the first page",
+            memory: "Starting with the new task. I have completed 1/10 steps",
+            next_goal: "Click on company a",
           },
           action: [{ click_element: { index: 0 } }],
         },
         id: String(this.state.toolId),
-        type: 'tool_call',
-      }
+        type: "tool_call",
+      },
     ];
 
     const exampleToolCall = new AIMessage({
-      content: '',
+      content: "",
       tool_calls: toolCalls,
     });
     this._addMessageWithTokens(exampleToolCall);
-    this.addToolMessage('Browser started');
+    this.addToolMessage("Browser started");
 
-    const placeholderMemoryMessage = new HumanMessage('[Your task history memory starts here]');
+    const placeholderMemoryMessage = new HumanMessage(
+      "[Your task history memory starts here]"
+    );
     this._addMessageWithTokens(placeholderMemoryMessage);
 
     if (this.settings.availableFilePaths) {
-      const filepathsMsg = new HumanMessage(`Here are file paths you can use: ${this.settings.availableFilePaths}`);
+      const filepathsMsg = new HumanMessage(
+        `Here are file paths you can use: ${this.settings.availableFilePaths}`
+      );
       this._addMessageWithTokens(filepathsMsg);
     }
   }
@@ -133,18 +151,20 @@ export class MessageManager {
       for (const r of result) {
         if (r.includeInMemory) {
           if (r.extractedContent) {
-            const msg = new HumanMessage('Action result: ' + String(r.extractedContent));
+            const msg = new HumanMessage(
+              "Action result: " + String(r.extractedContent)
+            );
             this._addMessageWithTokens(msg);
           }
           if (r.error) {
             // if endswith \n, remove it
             let errorMsg = r.error;
-            if (errorMsg.endsWith('\n')) {
+            if (errorMsg.endsWith("\n")) {
               errorMsg = errorMsg.slice(0, -1);
             }
             // get only last line of error
-            const lastLine = errorMsg.split('\n').pop() || '';
-            const msg = new HumanMessage('Action error: ' + lastLine);
+            const lastLine = errorMsg.split("\n").pop() || "";
+            const msg = new HumanMessage("Action error: " + lastLine);
             this._addMessageWithTokens(msg);
           }
           result = null; // if result in history, we dont want to add it again
@@ -168,21 +188,21 @@ export class MessageManager {
      */
     const toolCalls: ToolCall[] = [
       {
-        name: 'AgentOutput',
+        name: "AgentOutput",
         args: modelOutput,
         id: String(this.state.toolId),
-        type: 'tool_call',
-      }
+        type: "tool_call",
+      },
     ];
 
     const msg = new AIMessage({
-      content: '',
+      content: "",
       tool_calls: toolCalls,
     });
 
     this._addMessageWithTokens(msg);
     // empty tool response
-    this.addToolMessage('');
+    this.addToolMessage("");
   }
 
   addPlan(plan: string | null, position: number | null = null): void {
@@ -197,12 +217,14 @@ export class MessageManager {
      * Get current message list, potentially trimmed to max tokens
      */
     const messages = this.state.history.messages.map((m) => m.message);
-    
+
     // Debug which messages are in history with token count
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     let totalInputTokens = 0;
     for (const m of this.state.history.messages) {
       totalInputTokens += m.metadata.tokens;
     }
+    /* eslint-enable @typescript-eslint/no-unused-vars */
 
     return messages;
   }
@@ -212,7 +234,10 @@ export class MessageManager {
    * position: null for last, -1 for second last, etc.
    * This matches the Python implementation's _add_message_with_tokens method
    */
-  addMessageWithTokens(message: BaseMessage, position: number | null = null): void {
+  addMessageWithTokens(
+    message: BaseMessage,
+    position: number | null = null
+  ): void {
     // filter out sensitive data from the message
     if (this.settings.sensitiveData) {
       message = this._filterSensitiveData(message);
@@ -223,9 +248,12 @@ export class MessageManager {
     metadata.tokens = tokenCount;
     this.state.history.addMessage(message, metadata, position);
   }
-  
+
   // Private alias for backward compatibility
-  private _addMessageWithTokens(message: BaseMessage, position: number | null = null): void {
+  private _addMessageWithTokens(
+    message: BaseMessage,
+    position: number | null = null
+  ): void {
     this.addMessageWithTokens(message, position);
   }
 
@@ -238,11 +266,16 @@ export class MessageManager {
     }
 
     let content = String(message.content);
-    
+
     // Replace sensitive data with placeholders
-    for (const [placeholder, value] of Object.entries(this.settings.sensitiveData)) {
+    for (const [placeholder, value] of Object.entries(
+      this.settings.sensitiveData
+    )) {
       if (value && content.includes(value)) {
-        content = content.replace(new RegExp(value, 'g'), `<secret>${placeholder}</secret>`);
+        content = content.replace(
+          new RegExp(value, "g"),
+          `<secret>${placeholder}</secret>`
+        );
       }
     }
 
@@ -260,10 +293,10 @@ export class MessageManager {
     } else if (message instanceof ToolMessage) {
       return new ToolMessage({
         content,
-        tool_call_id: message.tool_call_id
+        tool_call_id: message.tool_call_id,
       });
     }
-    
+
     return message;
   }
 
@@ -272,32 +305,37 @@ export class MessageManager {
      * Estimate token count for a message
      */
     let tokenCount = 0;
-    
+
     // Count tokens in content
-    if (typeof message.content === 'string') {
-      tokenCount += Math.ceil(message.content.length / this.settings.estimatedCharactersPerToken);
+    if (typeof message.content === "string") {
+      tokenCount += Math.ceil(
+        message.content.length / this.settings.estimatedCharactersPerToken
+      );
     } else if (Array.isArray(message.content)) {
       for (const item of message.content) {
-        if (item.type === 'text') {
-          tokenCount += Math.ceil(item.text.length / this.settings.estimatedCharactersPerToken);
-        } else if (item.type === 'image_url') {
+        if (item.type === "text") {
+          tokenCount += Math.ceil(
+            item.text.length / this.settings.estimatedCharactersPerToken
+          );
+        } else if (item.type === "image_url") {
           tokenCount += this.settings.imageTokens;
         }
       }
     }
-    
+
     // Add tokens for tool calls if present
     if (message instanceof AIMessage && message.tool_calls) {
       for (const toolCall of message.tool_calls) {
         tokenCount += 50; // Base token count for tool call structure
         if (toolCall.args) {
           tokenCount += Math.ceil(
-            JSON.stringify(toolCall.args).length / this.settings.estimatedCharactersPerToken
+            JSON.stringify(toolCall.args).length /
+              this.settings.estimatedCharactersPerToken
           );
         }
       }
     }
-    
+
     return tokenCount;
   }
 
@@ -307,7 +345,7 @@ export class MessageManager {
      */
     const toolMessage = new ToolMessage({
       content,
-      tool_call_id: String(this.state.toolId)
+      tool_call_id: String(this.state.toolId),
     });
     this._addMessageWithTokens(toolMessage);
     this.state.toolId += 1;
@@ -320,7 +358,7 @@ export class MessageManager {
     if (maxTokens === null) {
       maxTokens = this.settings.maxInputTokens;
     }
-    
+
     while (this.state.history.currentTokens > maxTokens) {
       this.state.history.removeOldestMessage();
     }
@@ -330,7 +368,8 @@ export class MessageManager {
     /**
      * Cut messages to fit within token limit, matching Python implementation
      */
-    const diff = this.state.history.currentTokens - this.settings.maxInputTokens;
+    const diff =
+      this.state.history.currentTokens - this.settings.maxInputTokens;
     if (diff <= 0) {
       return;
     }
@@ -340,33 +379,35 @@ export class MessageManager {
     if (lastMessageIndex < 0) {
       return;
     }
-    
+
     const msgWrapper = this.state.history.messages[lastMessageIndex];
     if (!msgWrapper) {
       return;
     }
-    
+
     const msg = msgWrapper.message;
 
     // If content is a list with images, remove images first
     if (Array.isArray(msg.content)) {
-      let text = '';
+      let text = "";
       for (let i = msg.content.length - 1; i >= 0; i--) {
         const item = msg.content[i];
-        if (item && 'type' in item) {
-          if (item.type === 'image_url') {
+        if (item && "type" in item) {
+          if (item.type === "image_url") {
             // Remove image and update token counts
             msg.content.splice(i, 1);
             const imageTokens = this.settings.imageTokens || 0;
             msgWrapper.metadata.tokens -= imageTokens;
             this.state.history.currentTokens -= imageTokens;
-            console.debug(`Removed image with ${imageTokens} tokens - total tokens now: ${this.state.history.currentTokens}/${this.settings.maxInputTokens}`);
-          } else if (item.type === 'text' && 'text' in item) {
+            console.debug(
+              `Removed image with ${imageTokens} tokens - total tokens now: ${this.state.history.currentTokens}/${this.settings.maxInputTokens}`
+            );
+          } else if (item.type === "text" && "text" in item) {
             text += item.text;
           }
         }
       }
-      
+
       // Convert to text-only if we removed all images
       if (msg.content.length === 0) {
         msg.content = text;
@@ -375,7 +416,8 @@ export class MessageManager {
     }
 
     // Check if we're still over the limit
-    const updatedDiff = this.state.history.currentTokens - this.settings.maxInputTokens;
+    const updatedDiff =
+      this.state.history.currentTokens - this.settings.maxInputTokens;
     if (updatedDiff <= 0) {
       return;
     }
@@ -383,14 +425,26 @@ export class MessageManager {
     // If still over, remove text from state message proportionally
     const proportionToRemove = updatedDiff / msgWrapper.metadata.tokens;
     if (proportionToRemove > 0.99) {
-      throw new Error(`Max token limit reached - history is too long - reduce the system prompt or task. proportion_to_remove: ${proportionToRemove}`);
+      throw new Error(
+        `Max token limit reached - history is too long - reduce the system prompt or task. proportion_to_remove: ${proportionToRemove}`
+      );
     }
-    
-    console.debug(`Removing ${proportionToRemove * 100}% of the last message (${proportionToRemove * msgWrapper.metadata.tokens} / ${msgWrapper.metadata.tokens} tokens)`);
 
-    const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+    console.debug(
+      `Removing ${proportionToRemove * 100}% of the last message (${
+        proportionToRemove * msgWrapper.metadata.tokens
+      } / ${msgWrapper.metadata.tokens} tokens)`
+    );
+
+    const content =
+      typeof msg.content === "string"
+        ? msg.content
+        : JSON.stringify(msg.content);
     const charactersToRemove = Math.floor(content.length * proportionToRemove);
-    const truncatedContent = content.substring(0, content.length - charactersToRemove);
+    const truncatedContent = content.substring(
+      0,
+      content.length - charactersToRemove
+    );
 
     // Remove the last state message
     this.removeLastStateMessage();
@@ -400,8 +454,6 @@ export class MessageManager {
     this._addMessageWithTokens(newMsg);
   }
 
-
-
   /**
    * Remove the last state message from the history
    * This is used when we want to update the state without adding a new message
@@ -410,7 +462,7 @@ export class MessageManager {
     // Find the last message that is a HumanMessage (state message)
     const messages = this.state.history.messages;
     if (!messages) return; // Guard against undefined messages
-    
+
     for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];
       if (message && message.message instanceof HumanMessage) {
@@ -420,6 +472,4 @@ export class MessageManager {
       }
     }
   }
-
-
 }

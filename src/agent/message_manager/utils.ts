@@ -1,9 +1,15 @@
 /**
  * Utility functions for the message manager
  */
-import * as fs from 'fs';
-import * as path from 'path';
-import { AIMessage, BaseMessage, HumanMessage, SystemMessage, ToolMessage } from '@langchain/core/messages';
+import * as fs from "fs";
+import * as path from "path";
+import {
+  AIMessage,
+  BaseMessage,
+  HumanMessage,
+  SystemMessage,
+  ToolMessage,
+} from "@langchain/core/messages";
 
 /**
  * Extract JSON from model output, handling both plain JSON and code-block-wrapped JSON.
@@ -11,19 +17,19 @@ import { AIMessage, BaseMessage, HumanMessage, SystemMessage, ToolMessage } from
 export function extractJsonFromModelOutput(content: string): any {
   try {
     // If content is wrapped in code blocks, extract just the JSON part
-    if (content.includes('```')) {
+    if (content.includes("```")) {
       // Find the JSON content between code blocks
-      const parts = content.split('```');
+      const parts = content.split("```");
       if (parts.length > 1 && parts[1] !== undefined) {
         // TypeScript safety: ensure parts[1] exists
         const extractedContent = parts[1];
         content = extractedContent;
         // Remove language identifier if present (e.g., 'json\n')
-        if (content.includes('\n')) {
-          const lines = content.split('\n');
+        if (content.includes("\n")) {
+          const lines = content.split("\n");
           if (lines.length > 1) {
             // Skip the first line (language identifier) and join the rest
-            content = lines.slice(1).join('\n');
+            content = lines.slice(1).join("\n");
           }
         }
       }
@@ -32,7 +38,7 @@ export function extractJsonFromModelOutput(content: string): any {
     return JSON.parse(content);
   } catch (e) {
     console.warn(`Failed to parse model output: ${content} ${e}`);
-    throw new Error('Could not parse response.');
+    throw new Error("Could not parse response.");
   }
 }
 
@@ -46,10 +52,17 @@ export function convertInputMessages(
   if (modelName === null) {
     return inputMessages;
   }
-  if (modelName === 'deepseek-reasoner' || modelName.includes('deepseek-r1')) {
-    let convertedInputMessages = convertMessagesForNonFunctionCallingModels(inputMessages);
-    let mergedInputMessages = mergeSuccessiveMessages(convertedInputMessages, HumanMessage);
-    mergedInputMessages = mergeSuccessiveMessages(mergedInputMessages, AIMessage);
+  if (modelName === "deepseek-reasoner" || modelName.includes("deepseek-r1")) {
+    const convertedInputMessages =
+      convertMessagesForNonFunctionCallingModels(inputMessages);
+    let mergedInputMessages = mergeSuccessiveMessages(
+      convertedInputMessages,
+      HumanMessage
+    );
+    mergedInputMessages = mergeSuccessiveMessages(
+      mergedInputMessages,
+      AIMessage
+    );
     return mergedInputMessages;
   }
   return inputMessages;
@@ -58,7 +71,9 @@ export function convertInputMessages(
 /**
  * Convert messages for non-function-calling models
  */
-function convertMessagesForNonFunctionCallingModels(inputMessages: BaseMessage[]): BaseMessage[] {
+function convertMessagesForNonFunctionCallingModels(
+  inputMessages: BaseMessage[]
+): BaseMessage[] {
   const outputMessages: BaseMessage[] = [];
   for (const message of inputMessages) {
     if (message instanceof HumanMessage) {
@@ -67,17 +82,19 @@ function convertMessagesForNonFunctionCallingModels(inputMessages: BaseMessage[]
       outputMessages.push(message);
     } else if (message instanceof ToolMessage) {
       // Wrap message content in an object with content field if it's a complex type
-      if (typeof message.content === 'string') {
+      if (typeof message.content === "string") {
         outputMessages.push(new HumanMessage({ content: message.content }));
       } else {
         // Handle complex content type
-        outputMessages.push(new HumanMessage({ content: JSON.stringify(message.content) }));
+        outputMessages.push(
+          new HumanMessage({ content: JSON.stringify(message.content) })
+        );
       }
     } else if (message instanceof AIMessage) {
-      // @ts-ignore - TypeScript doesn't know about tool_calls property
-      if (message.tool_calls) {
-        // @ts-ignore
-        const toolCalls = JSON.stringify(message.tool_calls);
+      // Use type assertion to access tool_calls since it exists at runtime but isn't in the type definition
+      const aiMessage = message as AIMessage & { tool_calls?: any };
+      if (aiMessage.tool_calls) {
+        const toolCalls = JSON.stringify(aiMessage.tool_calls);
         outputMessages.push(new AIMessage({ content: toolCalls }));
       } else {
         outputMessages.push(message);
@@ -90,22 +107,44 @@ function convertMessagesForNonFunctionCallingModels(inputMessages: BaseMessage[]
 }
 
 /**
- * Some models like deepseek-reasoner dont allow multiple human messages in a row. 
+ * Some models like deepseek-reasoner dont allow multiple human messages in a row.
  * This function merges them into one.
  */
-function mergeSuccessiveMessages(messages: BaseMessage[], classToMerge: { new(...args: any[]): BaseMessage }): BaseMessage[] {
+function mergeSuccessiveMessages(
+  messages: BaseMessage[],
+  classToMerge: { new (...args: any[]): BaseMessage }
+): BaseMessage[] {
   const mergedMessages: BaseMessage[] = [];
   let streak = 0;
   for (const message of messages) {
     if (message instanceof classToMerge) {
       streak += 1;
       if (streak > 1) {
-        if (Array.isArray(message.content)) {
-          // @ts-ignore
-          mergedMessages[mergedMessages.length - 1].content += message.content[0].text;
-        } else {
-          // @ts-ignore
-          mergedMessages[mergedMessages.length - 1].content += message.content;
+        const lastMessage = mergedMessages[mergedMessages.length - 1];
+        if (lastMessage) {
+          if (Array.isArray(message.content)) {
+            const textContent =
+              typeof message.content[0] === "object" &&
+              "text" in message.content[0]
+                ? message.content[0].text
+                : JSON.stringify(message.content[0]);
+
+            if (Array.isArray(lastMessage.content)) {
+              if (
+                typeof lastMessage.content[0] === "object" &&
+                "text" in lastMessage.content[0]
+              ) {
+                lastMessage.content[0].text += textContent;
+              }
+            } else if (typeof lastMessage.content === "string") {
+              lastMessage.content += textContent;
+            }
+          } else if (
+            typeof message.content === "string" &&
+            typeof lastMessage.content === "string"
+          ) {
+            lastMessage.content += message.content;
+          }
         }
       } else {
         mergedMessages.push(message);
@@ -117,8 +156,6 @@ function mergeSuccessiveMessages(messages: BaseMessage[], classToMerge: { new(..
   }
   return mergedMessages;
 }
-
-
 
 /**
  * Save conversation history to file.
@@ -134,18 +171,18 @@ export function saveConversation(
 
   // Open file for writing
   const fileContent = [];
-  
+
   // Write messages
   for (const message of inputMessages) {
     fileContent.push(` ${message.constructor.name} `);
 
     if (Array.isArray(message.content)) {
       for (const item of message.content) {
-        if (typeof item === 'object' && item.type === 'text') {
+        if (typeof item === "object" && item.type === "text") {
           fileContent.push(item.text.trim());
         }
       }
-    } else if (typeof message.content === 'string') {
+    } else if (typeof message.content === "string") {
       try {
         const content = JSON.parse(message.content);
         fileContent.push(JSON.stringify(content, null, 2));
@@ -154,11 +191,11 @@ export function saveConversation(
       }
     }
 
-    fileContent.push('');
+    fileContent.push("");
   }
 
   // Write response
-  fileContent.push(' RESPONSE');
+  fileContent.push(" RESPONSE");
   // Assuming response has a toJSON method or similar
   try {
     const responseJson = JSON.parse(JSON.stringify(response));
@@ -168,5 +205,9 @@ export function saveConversation(
   }
 
   // Write to file
-  fs.writeFileSync(target, fileContent.join('\n'), encoding ? { encoding: encoding as BufferEncoding } : undefined);
+  fs.writeFileSync(
+    target,
+    fileContent.join("\n"),
+    encoding ? { encoding: encoding as BufferEncoding } : undefined
+  );
 }

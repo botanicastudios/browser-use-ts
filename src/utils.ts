@@ -7,14 +7,14 @@
  * @param label Label for the timing log
  */
 export function timeExecutionAsync(label: string) {
-  return function(
+  return function (
     _target: any,
     _propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
     const originalMethod = descriptor.value;
-    
-    descriptor.value = async function(...args: any[]) {
+
+    descriptor.value = async function (...args: any[]) {
       const start = performance.now();
       try {
         return await originalMethod.apply(this, args);
@@ -23,7 +23,7 @@ export function timeExecutionAsync(label: string) {
         console.log(`${label} took ${(end - start).toFixed(2)}ms`);
       }
     };
-    
+
     return descriptor;
   };
 }
@@ -33,14 +33,14 @@ export function timeExecutionAsync(label: string) {
  * @param label Label for the timing log
  */
 export function timeExecutionSync(label: string) {
-  return function(
+  return function (
     _target: any,
     _propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
     const originalMethod = descriptor.value;
-    
-    descriptor.value = function(...args: any[]) {
+
+    descriptor.value = function (...args: any[]) {
       const start = performance.now();
       try {
         return originalMethod.apply(this, args);
@@ -49,7 +49,7 @@ export function timeExecutionSync(label: string) {
         console.log(`${label} took ${(end - start).toFixed(2)}ms`);
       }
     };
-    
+
     return descriptor;
   };
 }
@@ -59,7 +59,7 @@ export function timeExecutionSync(label: string) {
  * @param ms Milliseconds to sleep
  */
 export async function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -67,30 +67,31 @@ export async function sleep(ms: number): Promise<void> {
  * @param date Date to format
  * @param format Format string
  */
-export function formatDate(date: Date, format: string = 'YYYY-MM-DD HH:mm:ss'): string {
+export function formatDate(date: Date, format = "YYYY-MM-DD HH:mm:ss"): string {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-  
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
   return format
-    .replace('YYYY', String(year))
-    .replace('MM', month)
-    .replace('DD', day)
-    .replace('HH', hours)
-    .replace('mm', minutes)
-    .replace('ss', seconds);
+    .replace("YYYY", String(year))
+    .replace("MM", month)
+    .replace("DD", day)
+    .replace("HH", hours)
+    .replace("mm", minutes)
+    .replace("ss", seconds);
 }
 
 /**
  * Generate a random string
  * @param length Length of the string
  */
-export function randomString(length: number = 10): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
+export function randomString(length = 10): string {
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
@@ -119,7 +120,7 @@ export function extractDomain(url: string): string {
     const { hostname } = new URL(url);
     return hostname;
   } catch (e) {
-    return '';
+    return "";
   }
 }
 
@@ -128,15 +129,19 @@ export function extractDomain(url: string): string {
  * @param url URL to check
  * @param allowedDomains List of allowed domains
  */
-export function isDomainAllowed(url: string, allowedDomains: string[] | null): boolean {
+export function isDomainAllowed(
+  url: string,
+  allowedDomains: string[] | null
+): boolean {
   if (!allowedDomains || allowedDomains.length === 0) {
     return true;
   }
-  
+
   try {
     const domain = extractDomain(url);
-    return allowedDomains.some(allowedDomain => 
-      domain === allowedDomain || domain.endsWith(`.${allowedDomain}`)
+    return allowedDomains.some(
+      (allowedDomain) =>
+        domain === allowedDomain || domain.endsWith(`.${allowedDomain}`)
     );
   } catch (e) {
     return false;

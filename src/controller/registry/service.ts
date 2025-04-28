@@ -1,9 +1,9 @@
 /**
  * TypeScript implementation of browser-use controller registry
  */
-import { BrowserContext } from '../../browser/context';
-import { ExtendedBrowserContext } from '../../browser/interfaces';
-import { ActionModel, ActionRegistry, RegisteredAction } from './views';
+import { BrowserContext } from "../../browser/context";
+import { ExtendedBrowserContext } from "../../browser/interfaces";
+import { ActionModel, ActionRegistry, RegisteredAction } from "./views";
 
 /**
  * Service for registering and managing actions
@@ -23,42 +23,43 @@ export class Registry<Context = any> {
    * This is a proper implementation that replaces the previous placeholder
    * @param func The function to create a parameter model for
    */
+  // eslint-disable-next-line @typescript-eslint/ban-types
   private _createParamModel(func: Function): any {
     // Extract function name and parameters
-    const funcName = func.name || 'anonymous';
+    const funcName = func.name || "anonymous";
     const funcStr = func.toString();
-    
+
     // Extract parameter names using regex
-    const paramMatch = funcStr.match(/\(([^)]*)\)/)?.[1] || '';
+    const paramMatch = funcStr.match(/\(([^)]*)\)/)?.[1] || "";
     const paramNames = paramMatch
-      .split(',')
-      .map(param => param.trim())
-      .filter(param => param.length > 0);
-    
+      .split(",")
+      .map((param) => param.trim())
+      .filter((param) => param.length > 0);
+
     // Create a dynamic model class with the extracted parameters
     return class DynamicModel extends ActionModel {
       constructor() {
         super();
         // Add function name as a property
-        Object.defineProperty(this, 'functionName', {
+        Object.defineProperty(this, "functionName", {
           value: funcName,
-          enumerable: true
+          enumerable: true,
         });
-        
+
         // Add parameters as properties with default values
-        paramNames.forEach(param => {
+        paramNames.forEach((param) => {
           // Skip undefined or null params
-          if (typeof param !== 'string') return;
-          
+          if (typeof param !== "string") return;
+
           // Remove type annotations if present
-          const parts = param.split(':');
+          const parts = param.split(":");
           if (parts.length > 0 && parts[0] !== undefined) {
             const paramName = parts[0].trim();
             if (paramName) {
               Object.defineProperty(this, paramName, {
                 value: undefined,
                 enumerable: true,
-                writable: true
+                writable: true,
               });
             }
           }
@@ -78,7 +79,8 @@ export class Registry<Context = any> {
       }
 
       // Use provided param model or create one from function
-      const actualParamModel = paramModel || this._createParamModel(descriptor.value);
+      const actualParamModel =
+        paramModel || this._createParamModel(descriptor.value);
 
       // Register the action
       const action = new RegisteredAction(
@@ -109,52 +111,58 @@ export class Registry<Context = any> {
     if (!this.registry.actions[actionName]) {
       throw new Error(`Action ${actionName} not found`);
     }
-    
+
     const action = this.registry.actions[actionName];
-    
+
     // Replace sensitive data in parameters if needed
     if (sensitiveData && Object.keys(sensitiveData).length > 0) {
       params = this._replaceSensitiveData(params, sensitiveData);
     }
-    
+
     // Apply file paths if needed
-    if (availableFilePaths && Array.isArray(availableFilePaths) && availableFilePaths.length > 0) {
-      const fileParamKey = 'file_path';
-      if (params && typeof params === 'object' && fileParamKey in params) {
+    if (
+      availableFilePaths &&
+      Array.isArray(availableFilePaths) &&
+      availableFilePaths.length > 0
+    ) {
+      const fileParamKey = "file_path";
+      if (params && typeof params === "object" && fileParamKey in params) {
         const requestedPath = params[fileParamKey];
         if (!availableFilePaths.includes(requestedPath)) {
           throw new Error(`File path ${requestedPath} is not available`);
         }
       }
     }
-    
+
     // Execute the action with appropriate parameters
-    return await action.function(
-      params, 
-      { 
-        browser: browser as unknown as ExtendedBrowserContext,
-        pageExtractionLlm,
-        sensitiveData,
-        availableFilePaths,
-        context
-      }
-    );
+    return await action.function(params, {
+      browser: browser as unknown as ExtendedBrowserContext,
+      pageExtractionLlm,
+      sensitiveData,
+      availableFilePaths,
+      context,
+    });
   }
 
   /**
    * Replaces sensitive data in parameters
    */
-  private _replaceSensitiveData(params: any, sensitiveData: Record<string, string>): any {
+  private _replaceSensitiveData(
+    params: any,
+    sensitiveData: Record<string, string>
+  ): any {
     const secretPattern = /<secret>(.*?)<\/secret>/g;
 
     const replaceSecrets = (value: any): any => {
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         return value.replace(secretPattern, (_, placeholder) => {
-          return sensitiveData[placeholder] || `<secret>${placeholder}</secret>`;
+          return (
+            sensitiveData[placeholder] || `<secret>${placeholder}</secret>`
+          );
         });
       } else if (Array.isArray(value)) {
-        return value.map(v => replaceSecrets(v));
-      } else if (value && typeof value === 'object') {
+        return value.map((v) => replaceSecrets(v));
+      } else if (value && typeof value === "object") {
         return Object.entries(value).reduce((acc, [k, v]) => {
           acc[k] = replaceSecrets(v);
           return acc;
@@ -178,15 +186,15 @@ export class Registry<Context = any> {
   createActionModel(includeActions?: string[]): typeof ActionModel {
     // Create a model that closely matches Python's create_model function with JSON Schema
     const registryRef = this.registry;
-    
+
     // Create a specialized action model class that only includes the specified actions
     class DynamicActionModel extends ActionModel {
       registry: ActionRegistry;
-      
+
       constructor() {
         super();
         this.registry = registryRef;
-        
+
         // Initialize with null values for all actions
         const registryActions = registryRef.actions;
         for (const name of Object.keys(registryActions)) {
@@ -195,41 +203,41 @@ export class Registry<Context = any> {
           }
         }
       }
-      
+
       // Provide JSON Schema information - this mirrors how Pydantic creates schemas
       static readonly jsonSchema = {
-        type: 'object',
-        properties: {} as Record<string, any>
+        type: "object",
+        properties: {} as Record<string, any>,
       };
     }
-    
+
     // Add schema definition for each allowed action
     const registryActions = registryRef.actions;
     for (const name of Object.keys(registryActions)) {
       if (!includeActions || includeActions.includes(name)) {
         const actionObj = registryActions[name];
-        
+
         // Skip if action definition is missing
         if (!actionObj) continue;
-        
+
         // Define the schema for this action
         // For all actions, use the action's parameter model schema
-      const paramModel = actionObj.paramModel;
-      let properties = {};
-      
-      // Try to get schema properties from the parameter model
-      if (paramModel && typeof paramModel === 'function') {
-        const schema = (paramModel as any).schema?.() || {};
-        properties = schema.properties || {};
-      }
-      
-      DynamicActionModel.jsonSchema.properties[name] = {
-        type: 'object',
-        description: actionObj.description || `Execute the ${name} action`,
-        properties: properties
-      };
-      
-      // No special cases for any actions
+        const paramModel = actionObj.paramModel;
+        let properties = {};
+
+        // Try to get schema properties from the parameter model
+        if (paramModel && typeof paramModel === "function") {
+          const schema = (paramModel as any).schema?.() || {};
+          properties = schema.properties || {};
+        }
+
+        DynamicActionModel.jsonSchema.properties[name] = {
+          type: "object",
+          description: actionObj.description || `Execute the ${name} action`,
+          properties: properties,
+        };
+
+        // No special cases for any actions
       }
     }
 

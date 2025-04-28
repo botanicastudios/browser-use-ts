@@ -1,7 +1,7 @@
 /**
  * Prompts for the agent
  */
-import { SystemMessage } from '@langchain/core/messages'
+import { SystemMessage } from "@langchain/core/messages";
 
 /**
  * Base class for all prompts
@@ -10,7 +10,7 @@ abstract class BasePrompt {
   protected prompt: string;
 
   constructor() {
-    this.prompt = '';
+    this.prompt = "";
   }
 
   /**
@@ -27,7 +27,7 @@ abstract class BasePrompt {
 export class SystemPrompt extends BasePrompt {
   constructor(
     availableActions: string,
-    maxActionsPerStep: number = 10,
+    maxActionsPerStep = 10,
     overrideSystemMessage?: string,
     extendSystemMessage?: string
   ) {
@@ -154,9 +154,9 @@ ${availableActions}`;
  * Agent message prompt for the agent
  * Exactly matches the Python implementation of AgentMessagePrompt
  */
-import { HumanMessage } from '@langchain/core/messages';
-import { BrowserState } from '../browser/views';
-import { ActionResult, AgentStepInfo } from './views';
+import { HumanMessage } from "@langchain/core/messages";
+import { BrowserState } from "../browser/views";
+import { ActionResult, AgentStepInfo } from "./views";
 
 export class AgentMessagePrompt {
   private state: BrowserState;
@@ -179,16 +179,19 @@ export class AgentMessagePrompt {
   /**
    * Get the user message for the state
    */
-  getUserMessage(useVision: boolean = true): HumanMessage {
+  getUserMessage(useVision = true): HumanMessage {
     // Use the clickableElementsToString method to get a filtered representation of the DOM tree
     // This is the key difference that keeps token counts manageable
-    const elementsText = this.state.elementTree?.clickableElementsToString(this.includeAttributes) || '';
+    const elementsText =
+      this.state.elementTree?.clickableElementsToString(
+        this.includeAttributes
+      ) || "";
 
     const hasContentAbove = (this.state.pixelsAbove || 0) > 0;
     const hasContentBelow = (this.state.pixelsBelow || 0) > 0;
 
-    let formattedElementsText = '';
-    if (elementsText !== '') {
+    let formattedElementsText = "";
+    if (elementsText !== "") {
       if (hasContentAbove) {
         formattedElementsText = `... ${this.state.pixelsAbove} pixels above - scroll or extract content to see more ...\n${elementsText}`;
       } else {
@@ -201,22 +204,26 @@ export class AgentMessagePrompt {
         formattedElementsText = `${formattedElementsText}\n[End of page]`;
       }
     } else {
-      formattedElementsText = 'empty page';
+      formattedElementsText = "empty page";
     }
 
-    let stepInfoDescription = '';
+    let stepInfoDescription = "";
     if (this.stepInfo) {
-      stepInfoDescription = `Current step: ${this.stepInfo.stepNumber + 1}/${this.stepInfo.maxSteps}`;
+      stepInfoDescription = `Current step: ${this.stepInfo.stepNumber + 1}/${
+        this.stepInfo.maxSteps
+      }`;
     }
 
-    const timeStr = new Date().toLocaleString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    }).replace(/(\/)/g, '-');
+    const timeStr = new Date()
+      .toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })
+      .replace(/(\/)/g, "-");
 
     stepInfoDescription += `Current date and time: ${timeStr}`;
 
@@ -236,12 +243,16 @@ ${stepInfoDescription}
       for (let i = 0; i < this.result.length; i++) {
         const resultItem = this.result[i];
         if (resultItem && resultItem.extractedContent) {
-          stateDescription += `\nAction result ${i + 1}/${this.result.length}: ${resultItem.extractedContent}`;
+          stateDescription += `\nAction result ${i + 1}/${
+            this.result.length
+          }: ${resultItem.extractedContent}`;
         }
         if (resultItem && resultItem.error) {
           // Only use last line of error
-          const error = resultItem.error.split('\n').pop() || '';
-          stateDescription += `\nAction error ${i + 1}/${this.result.length}: ...${error}`;
+          const error = resultItem.error.split("\n").pop() || "";
+          stateDescription += `\nAction error ${i + 1}/${
+            this.result.length
+          }: ...${error}`;
         }
       }
     }
@@ -250,12 +261,15 @@ ${stepInfoDescription}
       // Format message for vision model
       return new HumanMessage({
         content: [
-          { type: 'text', text: stateDescription },
+          { type: "text", text: stateDescription },
           {
-            type: 'image_url',
-            image_url: { url: `data:image/png;base64,${this.state.screenshot}`, detail: 'low' }
-          }
-        ]
+            type: "image_url",
+            image_url: {
+              url: `data:image/png;base64,${this.state.screenshot}`,
+              detail: "low",
+            },
+          },
+        ],
       });
     }
 

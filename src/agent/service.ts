@@ -27,8 +27,8 @@ import { Browser } from "../browser/browser";
 import { BrowserContextConfig } from "../browser/context";
 import { BrowserContext } from "../browser/context";
 import { BrowserState, BrowserStateHistory } from "../browser/views";
-// @ts-ignore - Used for type assertions
-import { DOMElementNode, ElementHash } from "../dom/types";
+// Use import type for type-only imports
+// import type { DOMElementNode, ElementHash } from '../dom/types';
 import {
   MessageManager,
   MessageManagerSettings,
@@ -161,10 +161,10 @@ export class Agent<Context = any> {
   context?: Context;
   private _messageManager: MessageManager;
   initialActions?: ActionModel[];
-  version: string = "unknown";
-  source: string = "unknown";
-  chatModelLibrary: string = "unknown";
-  modelName: string = "Unknown";
+  version = "unknown";
+  source = "unknown";
+  chatModelLibrary = "unknown";
+  modelName = "Unknown";
   plannerModelName?: string = undefined;
 
   /**
@@ -460,6 +460,7 @@ export class Agent<Context = any> {
     let result: ActionResult[] = [];
     const stepStartTime = Date.now() / 1000;
     let tokens = 0;
+    let shouldCreateHistoryItem = false;
 
     try {
       state = await this.browserContext.getState();
@@ -553,6 +554,8 @@ export class Agent<Context = any> {
       }
 
       this.state.consecutiveFailures = 0;
+      // Set flag to create history item if we have result and state
+      shouldCreateHistoryItem = !!result && !!state;
     } catch (e) {
       if ((e as Error).message === "Interrupted") {
         console.debug("Agent paused");
@@ -568,25 +571,19 @@ export class Agent<Context = any> {
 
       result = await this._handleStepError(e as Error);
       this.state.lastResult = result;
-    } finally {
-      const stepEndTime = Date.now() / 1000;
+      // Set flag to create history item if we have result and state
+      shouldCreateHistoryItem = !!result && !!state;
+    }
 
-      // Equivalent to Python's telemetry capturing
-      // We're not implementing telemetry here as per Python code structure
-
-      if (!result) {
-        return;
-      }
-
-      if (state) {
-        const metadata = new StepMetadata(
-          this.state.nSteps,
-          stepStartTime,
-          stepEndTime,
-          tokens
-        );
-        this._makeHistoryItem(modelOutput, state, result, metadata);
-      }
+    // Create history item outside of try/finally blocks
+    if (shouldCreateHistoryItem && result && state) {
+      const metadata = new StepMetadata(
+        this.state.nSteps,
+        stepStartTime,
+        Date.now() / 1000,
+        tokens
+      );
+      this._makeHistoryItem(modelOutput, state, result, metadata);
     }
   }
 
@@ -781,7 +778,7 @@ export class Agent<Context = any> {
   /**
    * Helper function to trim content for logging
    */
-  private _trimContent(content: any, maxLength: number = 500): string {
+  private _trimContent(content: any, maxLength = 500): string {
     if (content === null || content === undefined) {
       return "null";
     }
@@ -820,90 +817,83 @@ export class Agent<Context = any> {
 
     let parsed: AgentOutput | null = null;
 
-    // In Python: try/except block
-    try {
-      // In Python: if self.tool_calling_method == 'raw':
-      if (this.toolCallingMethod === "raw") {
-        // In Python: output = self.llm.invoke(input_messages)
-        const output = await this.llm.invoke(inputMessages);
+    // In Python: if self.tool_calling_method == 'raw':
+    if (this.toolCallingMethod === "raw") {
+      // In Python: output = self.llm.invoke(input_messages)
+      const output = await this.llm.invoke(inputMessages);
 
-        // In Python: output.content = self._remove_think_tags(str(output.content))
-        const cleanedContent = this._removeThinkTags(String(output.content));
+      // In Python: output.content = self._remove_think_tags(str(output.content))
+      const cleanedContent = this._removeThinkTags(String(output.content));
 
-        // In Python: try/except block for parsing
-        try {
-          // In Python: parsed_json = extract_json_from_model_output(output.content)
-          const parsedJson = extractJsonFromModelOutput(cleanedContent);
-          // In Python: parsed = self.AgentOutput(**parsed_json)
-          parsed = new AgentOutput(parsedJson);
-        } catch (e) {
-          // In Python: logger.warning(f'Failed to parse model output: {output} {str(e)}')
-          console.warn(
-            `Failed to parse model output: ${this._trimContent(
-              output.content
-            )} ${e}`
-          );
-          // In Python: raise ValueError('Could not parse response.')
-          throw new Error("Could not parse response.");
-        }
-      }
-      // In Python: elif self.tool_calling_method is None:
-      else if (
-        this.toolCallingMethod === undefined ||
-        this.toolCallingMethod === null
-      ) {
-        // In Python: structured_llm = self.llm.with_structured_output(self.AgentOutput, include_raw=True)
-        const structuredLlm = this.llm.withStructuredOutput(
-          this.AgentOutputSchema,
-          { includeRaw: true }
+      // In Python: try/except block for parsing
+      try {
+        // In Python: parsed_json = extract_json_from_model_output(output.content)
+        const parsedJson = extractJsonFromModelOutput(cleanedContent);
+        // In Python: parsed = self.AgentOutput(**parsed_json)
+        parsed = new AgentOutput(parsedJson);
+      } catch (e) {
+        // In Python: logger.warning(f'Failed to parse model output: {output} {str(e)}')
+        console.warn(
+          `Failed to parse model output: ${this._trimContent(
+            output.content
+          )} ${e}`
         );
-        // In Python: response: dict[str, Any] = await structured_llm.ainvoke(input_messages)
-        const response = (await structuredLlm.invoke(inputMessages)) as any;
-        // In Python: parsed: AgentOutput | None = response['parsed']
-        parsed = response.parsed ? new AgentOutput(response.parsed) : null;
-      }
-      // In Python: else:
-      else {
-        // In Python: structured_llm = self.llm.with_structured_output(...)
-        const structuredLlm = this.llm.withStructuredOutput(
-          this.AgentOutputSchema,
-          {
-            includeRaw: true,
-            method: this.toolCallingMethod,
-          }
-        );
-        // In Python: response = await structured_llm.ainvoke(input_messages)
-        const response = (await structuredLlm.invoke(inputMessages)) as any;
-
-        // In Python: parsed = response['parsed']
-        parsed = response.parsed ? new AgentOutput(response.parsed) : null;
-      }
-
-      // In Python: if parsed is None:
-      if (parsed === null) {
         // In Python: raise ValueError('Could not parse response.')
         throw new Error("Could not parse response.");
       }
-
-      // In Python: if len(parsed.action) > self.settings.max_actions_per_step:
-      if (
-        parsed.action &&
-        parsed.action.length > this.settings.maxActionsPerStep
-      ) {
-        // In Python: parsed.action = parsed.action[: self.settings.max_actions_per_step]
-        parsed.action = parsed.action.slice(0, this.settings.maxActionsPerStep);
-      }
-
-      // In Python: log_response(parsed)
-      logResponse(parsed);
-
-      // In Python: return parsed
-      return parsed;
-    } catch (e) {
-      // The Python implementation doesn't do any special handling here
-      // It just lets the error propagate up to be handled by the step method
-      throw e;
     }
+    // In Python: elif self.tool_calling_method is None:
+    else if (
+      this.toolCallingMethod === undefined ||
+      this.toolCallingMethod === null
+    ) {
+      // In Python: structured_llm = self.llm.with_structured_output(self.AgentOutput, include_raw=True)
+      const structuredLlm = this.llm.withStructuredOutput(
+        this.AgentOutputSchema,
+        { includeRaw: true }
+      );
+      // In Python: response: dict[str, Any] = await structured_llm.ainvoke(input_messages)
+      const response = (await structuredLlm.invoke(inputMessages)) as any;
+      // In Python: parsed: AgentOutput | None = response['parsed']
+      parsed = response.parsed ? new AgentOutput(response.parsed) : null;
+    }
+    // In Python: else:
+    else {
+      // In Python: structured_llm = self.llm.with_structured_output(...)
+      const structuredLlm = this.llm.withStructuredOutput(
+        this.AgentOutputSchema,
+        {
+          includeRaw: true,
+          method: this.toolCallingMethod,
+        }
+      );
+      // In Python: response = await structured_llm.ainvoke(input_messages)
+      const response = (await structuredLlm.invoke(inputMessages)) as any;
+
+      // In Python: parsed = response['parsed']
+      parsed = response.parsed ? new AgentOutput(response.parsed) : null;
+    }
+
+    // In Python: if parsed is None:
+    if (parsed === null) {
+      // In Python: raise ValueError('Could not parse response.')
+      throw new Error("Could not parse response.");
+    }
+
+    // In Python: if len(parsed.action) > self.settings.max_actions_per_step:
+    if (
+      parsed.action &&
+      parsed.action.length > this.settings.maxActionsPerStep
+    ) {
+      // In Python: parsed.action = parsed.action[: self.settings.max_actions_per_step]
+      parsed.action = parsed.action.slice(0, this.settings.maxActionsPerStep);
+    }
+
+    // In Python: log_response(parsed)
+    logResponse(parsed);
+
+    // In Python: return parsed
+    return parsed;
   }
 
   /**
@@ -911,7 +901,7 @@ export class Agent<Context = any> {
    */
   async multiAct(
     actions: any[],
-    checkForNewElements: boolean = true
+    checkForNewElements = true
   ): Promise<ActionResult[]> {
     const results: ActionResult[] = [];
 
@@ -1133,10 +1123,10 @@ export class Agent<Context = any> {
    * Run the agent to completion
    */
   async run(
-    maxSteps: number = 20,
+    maxSteps = 20,
     initialUrl?: string,
     initialActions?: ActionModel[],
-    waitForUserInput: boolean = false
+    waitForUserInput = false
   ): Promise<AgentHistoryList> {
     console.info(`🤖 Starting agent with task: ${this.task}`);
     console.info(`🔧 Model: ${this.modelName}`);

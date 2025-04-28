@@ -33,16 +33,20 @@ export class ActionResult {
   includeInMemory: boolean;
   error?: string;
 
-  constructor(params: ActionResultParams = {
-    isDone: false,
-    success: false,
-    extractedContent: "",
-    includeInMemory: false
-  }) {
+  constructor(
+    params: ActionResultParams = {
+      isDone: false,
+      success: false,
+      extractedContent: "",
+      includeInMemory: false,
+    }
+  ) {
     this.isDone = params.isDone !== undefined ? params.isDone : false;
     this.success = params.success !== undefined ? params.success : false;
-    this.extractedContent = params.extractedContent !== undefined ? params.extractedContent : "";
-    this.includeInMemory = params.includeInMemory !== undefined ? params.includeInMemory : false;
+    this.extractedContent =
+      params.extractedContent !== undefined ? params.extractedContent : "";
+    this.includeInMemory =
+      params.includeInMemory !== undefined ? params.includeInMemory : false;
     // Only set error if it exists in params
     if (params.error !== undefined) {
       this.error = params.error;

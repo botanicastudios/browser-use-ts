@@ -8,12 +8,14 @@
 export class RegisteredAction<T extends Record<string, any>> {
   name: string;
   description: string;
+  // eslint-disable-next-line @typescript-eslint/ban-types
   function: Function;
   paramModel: new () => T;
 
   constructor(
     name: string,
     description: string,
+    // eslint-disable-next-line @typescript-eslint/ban-types
     func: Function,
     paramModel: new () => T
   ) {
@@ -27,31 +29,33 @@ export class RegisteredAction<T extends Record<string, any>> {
    * Get a description of the action for the prompt
    */
   promptDescription(): string {
-    const skipKeys = ['title'];
+    const skipKeys = ["title"];
     let s = `${this.description}: \n`;
-    s += '{' + this.name + ': ';
-    
+    s += "{" + this.name + ": ";
+
     // Get the schema from the parameter model class
-    const schema = (this.paramModel as any).schema ? (this.paramModel as any).schema() : { properties: {} };
+    const schema = (this.paramModel as any).schema
+      ? (this.paramModel as any).schema()
+      : { properties: {} };
     const properties = schema.properties || {};
-    
+
     // Format the properties for the prompt, matching Python implementation
     const formattedProperties: Record<string, Record<string, any>> = {};
-    
+
     for (const [key, value] of Object.entries(properties)) {
       const valueObj = value as Record<string, any>;
       formattedProperties[key] = {};
-      
+
       for (const [subKey, subValue] of Object.entries(valueObj)) {
         if (!skipKeys.includes(subKey)) {
           formattedProperties[key][subKey] = subValue;
         }
       }
     }
-    
+
     // Format the properties for the prompt
     s += JSON.stringify(formattedProperties);
-    s += '}';
+    s += "}";
     return s;
   }
 }
@@ -77,13 +81,13 @@ export class ActionModel {
     if (!params.length) {
       return null;
     }
-    
+
     for (const param of params) {
-      if (param !== null && typeof param === 'object' && 'index' in param) {
+      if (param !== null && typeof param === "object" && "index" in param) {
         return param.index as number;
       }
     }
-    
+
     return null;
   }
 
@@ -94,7 +98,7 @@ export class ActionModel {
     const actionName = Object.keys(this.toJSON())[0];
     if (actionName) {
       const actionParams = this[actionName];
-      if (actionParams && typeof actionParams === 'object') {
+      if (actionParams && typeof actionParams === "object") {
         actionParams.index = index;
       }
     }
@@ -105,18 +109,18 @@ export class ActionModel {
    */
   toJSON(): Record<string, any> {
     const result: Record<string, any> = {};
-    
+
     // Get all properties that are not functions or part of the prototype
     for (const key of Object.keys(this)) {
       const value = this[key];
-      if (typeof value !== 'function' && key !== 'constructor') {
+      if (typeof value !== "function" && key !== "constructor") {
         result[key] = value;
       }
     }
-    
+
     return result;
   }
-  
+
   /**
    * Static method to create an ActionModel from JSON
    */
@@ -136,7 +140,7 @@ export class ActionRegistry {
    */
   getPromptDescription(): string {
     return Object.values(this.actions)
-      .map(action => action.promptDescription())
-      .join('\n');
+      .map((action) => action.promptDescription())
+      .join("\n");
   }
 }

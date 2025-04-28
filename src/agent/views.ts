@@ -1,11 +1,11 @@
-import { v4 as uuidv4 } from 'uuid';
-import { BaseChatModel } from '@langchain/core/language_models/chat_models';
-import { ActionModel } from '../controller/registry/views';
-import { BrowserStateHistory } from '../browser/views';
-import { SelectorMap } from '../dom/views';
+import { v4 as uuidv4 } from "uuid";
+import { BaseChatModel } from "@langchain/core/language_models/chat_models";
+import { ActionModel } from "../controller/registry/views";
+import { BrowserStateHistory } from "../browser/views";
+import { SelectorMap } from "../dom/views";
 
 // Forward declarations to avoid circular imports
-import { MessageManagerState } from './message_manager/views';
+import { MessageManagerState } from "./message_manager/views";
 
 // Import types from DOM module
 interface DOMElementNode {
@@ -18,12 +18,18 @@ interface DOMHistoryElement {
 
 // Mock HistoryTreeProcessor for type compatibility
 class HistoryTreeProcessor {
-  static convertDomElementToHistoryElement(el: DOMElementNode): DOMHistoryElement {
+  static convertDomElementToHistoryElement(
+    el: DOMElementNode
+  ): DOMHistoryElement {
     return el as unknown as DOMHistoryElement;
   }
 }
 
-export type ToolCallingMethod = 'function_calling' | 'json_mode' | 'raw' | 'auto';
+export type ToolCallingMethod =
+  | "function_calling"
+  | "json_mode"
+  | "raw"
+  | "auto";
 
 // Define Zod schemas and classes for each model, similar to Pydantic in Python
 
@@ -52,80 +58,99 @@ export interface IAgentSettings {
 
 // AgentSettings schema as a plain JavaScript object
 export const AgentSettingsSchema = {
-  type: 'object',
+  type: "object",
   properties: {
-    useVision: { type: 'boolean', default: true },
-    useVisionForPlanner: { type: 'boolean', default: false },
-    saveConversationPath: { type: ['string', 'null'], default: null },
-    saveConversationPathEncoding: { type: ['string', 'null'], default: 'utf-8' },
-    maxFailures: { type: 'number', default: 3 },
-    retryDelay: { type: 'number', default: 10 },
-    maxInputTokens: { type: 'number', default: 128000 },
-    validateOutput: { type: 'boolean', default: false },
-    messageContext: { type: ['string', 'null'], default: null },
-    generateGif: { type: ['boolean', 'string'], default: false },
-    availableFilePaths: { type: ['array', 'null'], items: { type: 'string' }, default: null },
-    overrideSystemMessage: { type: ['string', 'null'], default: null },
-    extendSystemMessage: { type: ['string', 'null'], default: null },
-    includeAttributes: { 
-      type: 'array', 
-      items: { type: 'string' }, 
-      default: [
-        'title',
-        'type',
-        'name',
-        'role',
-        'tabindex',
-        'aria-label',
-        'placeholder',
-        'value',
-        'alt',
-        'aria-expanded',
-      ] 
+    useVision: { type: "boolean", default: true },
+    useVisionForPlanner: { type: "boolean", default: false },
+    saveConversationPath: { type: ["string", "null"], default: null },
+    saveConversationPathEncoding: {
+      type: ["string", "null"],
+      default: "utf-8",
     },
-    maxActionsPerStep: { type: 'number', default: 10 },
-    toolCallingMethod: { type: ['string', 'null'], enum: ['function_calling', 'json_mode', 'raw', 'auto'], default: 'auto' },
-    pageExtractionLlm: { type: ['object', 'null'], default: null },
-    plannerLlm: { type: ['object', 'null'], default: null },
-    plannerInterval: { type: 'number', default: 1 }
+    maxFailures: { type: "number", default: 3 },
+    retryDelay: { type: "number", default: 10 },
+    maxInputTokens: { type: "number", default: 128000 },
+    validateOutput: { type: "boolean", default: false },
+    messageContext: { type: ["string", "null"], default: null },
+    generateGif: { type: ["boolean", "string"], default: false },
+    availableFilePaths: {
+      type: ["array", "null"],
+      items: { type: "string" },
+      default: null,
+    },
+    overrideSystemMessage: { type: ["string", "null"], default: null },
+    extendSystemMessage: { type: ["string", "null"], default: null },
+    includeAttributes: {
+      type: "array",
+      items: { type: "string" },
+      default: [
+        "title",
+        "type",
+        "name",
+        "role",
+        "tabindex",
+        "aria-label",
+        "placeholder",
+        "value",
+        "alt",
+        "aria-expanded",
+      ],
+    },
+    maxActionsPerStep: { type: "number", default: 10 },
+    toolCallingMethod: {
+      type: ["string", "null"],
+      enum: ["function_calling", "json_mode", "raw", "auto"],
+      default: "auto",
+    },
+    pageExtractionLlm: { type: ["object", "null"], default: null },
+    plannerLlm: { type: ["object", "null"], default: null },
+    plannerInterval: { type: "number", default: 1 },
   },
-  required: ['useVision', 'maxFailures', 'retryDelay', 'maxInputTokens', 'validateOutput', 'includeAttributes', 'maxActionsPerStep']
+  required: [
+    "useVision",
+    "maxFailures",
+    "retryDelay",
+    "maxInputTokens",
+    "validateOutput",
+    "includeAttributes",
+    "maxActionsPerStep",
+  ],
 };
 
 export class AgentSettings implements IAgentSettings {
   /**
    * Options for the agent
    */
-  useVision: boolean = true;
-  useVisionForPlanner: boolean = false;
+  useVision = true;
+  useVisionForPlanner = false;
   saveConversationPath: string | null = null;
-  saveConversationPathEncoding: string | null = 'utf-8';
-  maxFailures: number = 3;
-  retryDelay: number = 10;
-  maxInputTokens: number = 128000;
-  validateOutput: boolean = false;
+  saveConversationPathEncoding: string | null = "utf-8";
+  maxFailures = 3;
+  retryDelay = 10;
+  maxInputTokens = 128000;
+  validateOutput = false;
   messageContext: string | null = null;
   generateGif: boolean | string = false;
   availableFilePaths: string[] | null = null;
   overrideSystemMessage: string | null = null;
   extendSystemMessage: string | null = null;
   includeAttributes: string[] = [
-    'title',
-    'type',
-    'name',
-    'role',
-    'tabindex',
-    'aria-label',
-    'placeholder',
-    'value',
-    'alt',
-    'aria-expanded',
+    "title",
+    "type",
+    "name",
+    "role",
+    "tabindex",
+    "aria-label",
+    "placeholder",
+    "value",
+    "alt",
+    "aria-expanded",
   ];
-  maxActionsPerStep: number = 10;
-  toolCallingMethod: ToolCallingMethod | null = 'auto';
+  maxActionsPerStep = 10;
+  toolCallingMethod: ToolCallingMethod | null = "auto";
   pageExtractionLlm: BaseChatModel | null = null;
   plannerLlm: BaseChatModel | null = null;
-  plannerInterval: number = 1; // Run planner every N steps
+  plannerInterval = 1; // Run planner every N steps
 
   static schema = AgentSettingsSchema;
 
@@ -162,7 +187,9 @@ export class AgentHistoryList {
     if (this.history.length === 0) {
       return 0;
     }
-    const historyWithMetadata = this.history.filter(item => item.metadata !== null);
+    const historyWithMetadata = this.history.filter(
+      (item) => item.metadata !== null
+    );
     if (historyWithMetadata.length === 0) {
       return 0;
     }
@@ -188,7 +215,9 @@ export class AgentHistoryList {
     if (this.history.length === 0) {
       return 0;
     }
-    const historyWithMetadata = this.history.filter(item => item.metadata !== null);
+    const historyWithMetadata = this.history.filter(
+      (item) => item.metadata !== null
+    );
     if (historyWithMetadata.length === 0) {
       return 0;
     }
@@ -202,14 +231,14 @@ export class AgentHistoryList {
     if (this.history.length === 0) {
       return false;
     }
-    
+
     // Check if the last action result indicates completion
     const lastHistory = this.history[this.history.length - 1];
     if (lastHistory && lastHistory.result && lastHistory.result.length > 0) {
       const lastResult = lastHistory.result[lastHistory.result.length - 1];
       return lastResult ? lastResult.isDone === true : false;
     }
-    
+
     return false;
   }
 
@@ -217,7 +246,7 @@ export class AgentHistoryList {
     /**
      * Serialize history list to JSON
      */
-    return this.history.map(item => item.toJSON());
+    return this.history.map((item) => item.toJSON());
   }
 }
 
@@ -237,20 +266,29 @@ export interface IAgentState {
 
 // AgentState schema as a plain JavaScript object
 export const AgentStateSchema = {
-  type: 'object',
+  type: "object",
   properties: {
-    agentId: { type: 'string', default: uuidv4() },
-    nSteps: { type: 'number', default: 1 },
-    consecutiveFailures: { type: 'number', default: 0 },
-    lastResult: { type: ['array', 'null'], default: null },
-    history: { type: 'object', default: new AgentHistoryList() },
-    lastPlan: { type: ['string', 'null'], default: null },
-    paused: { type: 'boolean', default: false },
-    stopped: { type: 'boolean', default: false },
-    messageManagerState: { type: 'object', default: new MessageManagerState() },
-    errorHistory: { type: 'object', default: {} }
+    agentId: { type: "string", default: uuidv4() },
+    nSteps: { type: "number", default: 1 },
+    consecutiveFailures: { type: "number", default: 0 },
+    lastResult: { type: ["array", "null"], default: null },
+    history: { type: "object", default: new AgentHistoryList() },
+    lastPlan: { type: ["string", "null"], default: null },
+    paused: { type: "boolean", default: false },
+    stopped: { type: "boolean", default: false },
+    messageManagerState: { type: "object", default: new MessageManagerState() },
+    errorHistory: { type: "object", default: {} },
   },
-  required: ['agentId', 'nSteps', 'consecutiveFailures', 'history', 'paused', 'stopped', 'messageManagerState', 'errorHistory']
+  required: [
+    "agentId",
+    "nSteps",
+    "consecutiveFailures",
+    "history",
+    "paused",
+    "stopped",
+    "messageManagerState",
+    "errorHistory",
+  ],
 };
 
 export class AgentState implements IAgentState {
@@ -258,13 +296,13 @@ export class AgentState implements IAgentState {
    * Holds all state information for an Agent
    */
   agentId: string = uuidv4();
-  nSteps: number = 1;
-  consecutiveFailures: number = 0;
+  nSteps = 1;
+  consecutiveFailures = 0;
   lastResult: ActionResult[] | null = null;
   history: AgentHistoryList = new AgentHistoryList();
   lastPlan: string | null = null;
-  paused: boolean = false;
-  stopped: boolean = false;
+  paused = false;
+  stopped = false;
   messageManagerState: MessageManagerState = new MessageManagerState();
   errorHistory: Record<string, number> = {};
 
@@ -285,12 +323,12 @@ export interface IAgentStepInfo {
 
 // AgentStepInfo schema as a plain JavaScript object
 export const AgentStepInfoSchema = {
-  type: 'object',
+  type: "object",
   properties: {
-    stepNumber: { type: 'number' },
-    maxSteps: { type: 'number' }
+    stepNumber: { type: "number" },
+    maxSteps: { type: "number" },
   },
-  required: ['stepNumber', 'maxSteps']
+  required: ["stepNumber", "maxSteps"],
 };
 
 export class AgentStepInfo implements IAgentStepInfo {
@@ -326,15 +364,15 @@ export interface IActionResult {
 
 // ActionResult schema as a plain JavaScript object
 export const ActionResultSchema = {
-  type: 'object',
+  type: "object",
   properties: {
-    isDone: { type: ['boolean', 'null'], default: false },
-    success: { type: ['boolean', 'null'], default: null },
-    extractedContent: { type: ['string', 'null'], default: null },
-    error: { type: ['string', 'null'] },
-    includeInMemory: { type: 'boolean', default: false }
+    isDone: { type: ["boolean", "null"], default: false },
+    success: { type: ["boolean", "null"], default: null },
+    extractedContent: { type: ["string", "null"], default: null },
+    error: { type: ["string", "null"] },
+    includeInMemory: { type: "boolean", default: false },
   },
-  required: ['isDone', 'success', 'extractedContent', 'includeInMemory']
+  required: ["isDone", "success", "extractedContent", "includeInMemory"],
 };
 
 export class ActionResult implements IActionResult {
@@ -345,16 +383,18 @@ export class ActionResult implements IActionResult {
   success: boolean | null = null;
   extractedContent: string | null = null;
   error?: string | null = null;
-  includeInMemory: boolean = false; // whether to include in past messages as context or not
+  includeInMemory = false; // whether to include in past messages as context or not
 
   static schema = ActionResultSchema;
 
   constructor(params: Partial<IActionResult> = {}) {
     if (params.isDone !== undefined) this.isDone = params.isDone;
     if (params.success !== undefined) this.success = params.success;
-    if (params.extractedContent !== undefined) this.extractedContent = params.extractedContent;
+    if (params.extractedContent !== undefined)
+      this.extractedContent = params.extractedContent;
     if (params.error !== undefined) this.error = params.error;
-    if (params.includeInMemory !== undefined) this.includeInMemory = params.includeInMemory;
+    if (params.includeInMemory !== undefined)
+      this.includeInMemory = params.includeInMemory;
   }
 }
 
@@ -369,15 +409,15 @@ export interface IStepMetadata {
 
 // StepMetadata schema as a plain JavaScript object
 export const StepMetadataSchema = {
-  type: 'object',
+  type: "object",
   properties: {
-    stepStartTime: { type: 'number' },
-    stepEndTime: { type: 'number' },
-    inputTokens: { type: 'number' },
-    stepNumber: { type: 'number' },
-    durationSeconds: { type: 'number' }
+    stepStartTime: { type: "number" },
+    stepEndTime: { type: "number" },
+    inputTokens: { type: "number" },
+    stepNumber: { type: "number" },
+    durationSeconds: { type: "number" },
   },
-  required: ['stepStartTime', 'stepEndTime', 'inputTokens', 'stepNumber']
+  required: ["stepStartTime", "stepEndTime", "inputTokens", "stepNumber"],
 };
 
 export class StepMetadata implements IStepMetadata {
@@ -391,7 +431,12 @@ export class StepMetadata implements IStepMetadata {
 
   static schema = StepMetadataSchema;
 
-  constructor(stepStartTime: number, stepEndTime: number, inputTokens: number, stepNumber: number) {
+  constructor(
+    stepStartTime: number,
+    stepEndTime: number,
+    inputTokens: number,
+    stepNumber: number
+  ) {
     this.stepStartTime = stepStartTime;
     this.stepEndTime = stepEndTime;
     this.inputTokens = inputTokens;
@@ -415,13 +460,13 @@ export interface IAgentBrain {
 
 // AgentBrain schema as a plain JavaScript object
 export const AgentBrainSchema = {
-  type: 'object',
+  type: "object",
   properties: {
-    evaluation_previous_goal: { type: 'string' },
-    memory: { type: 'string' },
-    next_goal: { type: 'string' }
+    evaluation_previous_goal: { type: "string" },
+    memory: { type: "string" },
+    next_goal: { type: "string" },
   },
-  required: ['evaluation_previous_goal', 'memory', 'next_goal']
+  required: ["evaluation_previous_goal", "memory", "next_goal"],
 };
 
 export class AgentBrain {
@@ -434,7 +479,11 @@ export class AgentBrain {
 
   static schema = AgentBrainSchema;
 
-  constructor(evaluationPreviousGoal: string, memory: string, nextGoal: string) {
+  constructor(
+    evaluationPreviousGoal: string,
+    memory: string,
+    nextGoal: string
+  ) {
     this.evaluationPreviousGoal = evaluationPreviousGoal;
     this.memory = memory;
     this.nextGoal = nextGoal;
@@ -449,18 +498,19 @@ export interface IAgentOutput {
 
 // AgentOutput schema as a plain JavaScript object
 export const AgentOutputSchema = {
-  type: 'object',
+  type: "object",
   properties: {
     current_state: AgentBrainSchema,
     action: {
-      type: 'array',
+      type: "array",
       items: {
-        type: 'object'
+        type: "object",
       },
-      description: 'List of actions to execute (at least one action is required)'
-    }
+      description:
+        "List of actions to execute (at least one action is required)",
+    },
   },
-  required: ['current_state', 'action']
+  required: ["current_state", "action"],
 };
 
 // DoneAgentOutput interface
@@ -470,41 +520,41 @@ export interface IDoneAgentOutput {
     done: {
       text: string;
       success: boolean;
-    }
+    };
   }>;
 }
 
 // DoneAgentOutput schema as a plain JavaScript object
 export const DoneAgentOutputSchema = {
-  type: 'object',
+  type: "object",
   properties: {
     current_state: AgentBrainSchema,
     action: {
-      type: 'array',
+      type: "array",
       items: {
-        type: 'object',
+        type: "object",
         properties: {
           done: {
-            type: 'object',
+            type: "object",
             properties: {
-              text: { type: 'string' },
-              success: { type: 'boolean' }
+              text: { type: "string" },
+              success: { type: "boolean" },
             },
-            required: ['text', 'success']
-          }
+            required: ["text", "success"],
+          },
         },
-        required: ['done']
+        required: ["done"],
       },
-      description: 'Done action with text and success properties'
-    }
+      description: "Done action with text and success properties",
+    },
   },
-  required: ['current_state', 'action']
+  required: ["current_state", "action"],
 };
 
 export class AgentOutput implements IAgentOutput {
   /**
    * Output model for agent
-   * 
+   *
    * @dev note: this model is extended with custom actions in AgentService. You can also use some fields that are not in this model as provided by the linter, as long as they are registered in the DynamicActions model.
    */
   currentState: AgentBrain;
@@ -515,9 +565,9 @@ export class AgentOutput implements IAgentOutput {
 
   constructor(data: any) {
     this.currentState = new AgentBrain(
-      data.current_state?.evaluation_previous_goal || '',
-      data.current_state?.memory || '',
-      data.current_state?.next_goal || ''
+      data.current_state?.evaluation_previous_goal || "",
+      data.current_state?.memory || "",
+      data.current_state?.next_goal || ""
     );
     // Convert action array to ActionModel instances
     this.action = (data.action || []).map((actionData: any) => {
@@ -525,7 +575,9 @@ export class AgentOutput implements IAgentOutput {
     });
   }
 
-  static typeWithCustomActions(_customActions: typeof ActionModel): typeof AgentOutput {
+  static typeWithCustomActions(
+    _customActions: typeof ActionModel
+  ): typeof AgentOutput {
     /**
      * Extend actions with custom actions
      */
@@ -537,7 +589,7 @@ export class AgentOutput implements IAgentOutput {
     return {
       evaluation_previous_goal: this.currentState.evaluationPreviousGoal,
       memory: this.currentState.memory,
-      next_goal: this.currentState.nextGoal
+      next_goal: this.currentState.nextGoal,
     };
   }
 }
@@ -551,9 +603,9 @@ export class DoneAgentOutput implements IDoneAgentOutput {
     done: {
       text: string;
       success: boolean;
-    }
+    };
   }>;
-  done: true = true;
+  done = true as const;
   reason?: string;
 
   // Schema definition for structured output
@@ -561,9 +613,9 @@ export class DoneAgentOutput implements IDoneAgentOutput {
 
   constructor(data: any) {
     this.currentState = new AgentBrain(
-      data.current_state?.evaluation_previous_goal || '',
-      data.current_state?.memory || '',
-      data.current_state?.next_goal || ''
+      data.current_state?.evaluation_previous_goal || "",
+      data.current_state?.memory || "",
+      data.current_state?.next_goal || ""
     );
     // Convert action array to ActionModel instances with done property
     this.action = (data.action || []).map((actionData: any) => {
@@ -571,16 +623,16 @@ export class DoneAgentOutput implements IDoneAgentOutput {
         const actionObj = actionData.toJSON();
         return {
           done: {
-            text: actionObj['done']?.text || '',
-            success: actionObj['done']?.success || false
-          }
+            text: actionObj["done"]?.text || "",
+            success: actionObj["done"]?.success || false,
+          },
         };
       }
       return {
         done: {
-          text: actionData['done']?.text || '',
-          success: actionData['done']?.success || false
-        }
+          text: actionData["done"]?.text || "",
+          success: actionData["done"]?.success || false,
+        },
       };
     });
     if (data.reason) {
@@ -588,19 +640,21 @@ export class DoneAgentOutput implements IDoneAgentOutput {
     }
   }
 
-  static typeWithCustomActions(_customActions: typeof ActionModel): typeof DoneAgentOutput {
+  static typeWithCustomActions(
+    _customActions: typeof ActionModel
+  ): typeof DoneAgentOutput {
     /**
      * Extend actions with custom actions
      */
     return DoneAgentOutput;
   }
-  
+
   // Getter for current_state to match interface
   get current_state(): IAgentBrain {
     return {
       evaluation_previous_goal: this.currentState.evaluationPreviousGoal,
       memory: this.currentState.memory,
-      next_goal: this.currentState.nextGoal
+      next_goal: this.currentState.nextGoal,
     };
   }
 }
@@ -615,20 +669,31 @@ export class AgentHistory {
   state: BrowserStateHistory;
   metadata: StepMetadata | null;
 
-  constructor(modelOutput: AgentOutput | null, result: ActionResult[], state: BrowserStateHistory, metadata: StepMetadata | null = null) {
+  constructor(
+    modelOutput: AgentOutput | null,
+    result: ActionResult[],
+    state: BrowserStateHistory,
+    metadata: StepMetadata | null = null
+  ) {
     this.modelOutput = modelOutput;
     this.result = result;
     this.state = state;
     this.metadata = metadata;
   }
 
-  static getInteractedElement(modelOutput: AgentOutput, selectorMap: SelectorMap): (DOMHistoryElement | null)[] {
+  static getInteractedElement(
+    modelOutput: AgentOutput,
+    selectorMap: SelectorMap
+  ): (DOMHistoryElement | null)[] {
     const elements: (DOMHistoryElement | null)[] = [];
     for (const action of modelOutput.action) {
-      const index = typeof action.getIndex === 'function' ? action.getIndex() : null;
+      const index =
+        typeof action.getIndex === "function" ? action.getIndex() : null;
       if (index !== null && index in selectorMap) {
         const el: DOMElementNode = selectorMap[index] as DOMElementNode;
-        elements.push(HistoryTreeProcessor.convertDomElementToHistoryElement(el));
+        elements.push(
+          HistoryTreeProcessor.convertDomElementToHistoryElement(el)
+        );
       } else {
         elements.push(null);
       }
@@ -642,16 +707,19 @@ export class AgentHistory {
      */
     let modelOutputDump = null;
     if (this.modelOutput) {
-      const actionDump = this.modelOutput.action.map(action => {
+      const actionDump = this.modelOutput.action.map((action) => {
         const actionObj: Record<string, any> = {};
         for (const key in action) {
-          if (key !== 'undefined' && (action as Record<string, any>)[key] !== undefined) {
+          if (
+            key !== "undefined" &&
+            (action as Record<string, any>)[key] !== undefined
+          ) {
             actionObj[key] = (action as Record<string, any>)[key];
           }
         }
         return actionObj;
       });
-      
+
       modelOutputDump = {
         currentState: this.modelOutput.currentState,
         action: actionDump,
@@ -660,10 +728,13 @@ export class AgentHistory {
 
     return {
       modelOutput: modelOutputDump,
-      result: this.result.map(r => {
+      result: this.result.map((r) => {
         const resultObj: Record<string, any> = {};
         for (const key in r) {
-          if ((r as Record<string, any>)[key] !== undefined && (r as Record<string, any>)[key] !== null) {
+          if (
+            (r as Record<string, any>)[key] !== undefined &&
+            (r as Record<string, any>)[key] !== null
+          ) {
             resultObj[key] = (r as Record<string, any>)[key];
           }
         }
@@ -679,17 +750,18 @@ export class AgentError {
   /**
    * Container for agent error handling
    */
-  static VALIDATION_ERROR = 'Invalid model output format. Please follow the correct schema.';
-  static RATE_LIMIT_ERROR = 'Rate limit reached. Waiting before retry.';
-  static NO_VALID_ACTION = 'No valid action found';
+  static VALIDATION_ERROR =
+    "Invalid model output format. Please follow the correct schema.";
+  static RATE_LIMIT_ERROR = "Rate limit reached. Waiting before retry.";
+  static NO_VALID_ACTION = "No valid action found";
 
-  static formatError(error: Error, includeTrace: boolean = false): string {
+  static formatError(error: Error, includeTrace = false): string {
     /**
      * Format error message based on error type and optionally include trace
      */
     let message = error.message;
     if (includeTrace && error.stack) {
-      message += '\n' + error.stack;
+      message += "\n" + error.stack;
     }
     return message;
   }

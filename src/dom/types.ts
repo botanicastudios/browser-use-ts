@@ -29,7 +29,7 @@ export interface DOMElementNode {
   };
   xpath?: string;
   selector?: string;
-  hash?: ElementHash; 
+  hash?: ElementHash;
 }
 
 export interface DOMTreeOptions {

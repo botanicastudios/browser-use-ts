@@ -2,7 +2,12 @@
  * TypeScript implementation of browser-use browser views
  */
 
-import { DOMState, DOMHistoryElement, DOMElementNode, SelectorMap } from '../dom/views';
+import {
+  DOMState,
+  DOMHistoryElement,
+  DOMElementNode,
+  SelectorMap,
+} from "../dom/views";
 
 /**
  * Represents information about a browser tab
@@ -22,25 +27,25 @@ export class BrowserState extends DOMState {
   title: string;
   tabs: TabInfo[];
   screenshot: string | undefined;
-  pixelsAbove: number = 0;
-  pixelsBelow: number = 0;
+  pixelsAbove = 0;
+  pixelsBelow = 0;
   browserErrors: string[] = [];
   // elementTree is inherited from DOMState
-  
+
   constructor(
     url: string,
     title: string,
     tabs: TabInfo[],
     screenshot?: string,
-    pixelsAbove: number = 0,
-    pixelsBelow: number = 0,
+    pixelsAbove = 0,
+    pixelsBelow = 0,
     browserErrors: string[] = [],
     elementTree?: DOMElementNode,
     rootElement?: DOMElementNode,
     selectorMap?: SelectorMap
   ) {
     // Initialize with empty DOM elements if not provided
-    super(rootElement || {} as DOMElementNode, selectorMap || {});
+    super(rootElement || ({} as DOMElementNode), selectorMap || {});
     this.url = url;
     this.title = title;
     this.tabs = tabs;
@@ -80,11 +85,13 @@ export class BrowserStateHistory {
 
   toDict(): Record<string, any> {
     const data: Record<string, any> = {};
-    data['tabs'] = this.tabs;
-    data['screenshot'] = this.screenshot;
-    data['interactedElement'] = this.interactedElement.map(el => el ? el.toDict() : null);
-    data['url'] = this.url;
-    data['title'] = this.title;
+    data["tabs"] = this.tabs;
+    data["screenshot"] = this.screenshot;
+    data["interactedElement"] = this.interactedElement.map((el) =>
+      el ? el.toDict() : null
+    );
+    data["url"] = this.url;
+    data["title"] = this.title;
     return data;
   }
 }
@@ -95,7 +102,7 @@ export class BrowserStateHistory {
 export class BrowserError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'BrowserError';
+    this.name = "BrowserError";
   }
 }
 
@@ -105,6 +112,6 @@ export class BrowserError extends Error {
 export class URLNotAllowedError extends BrowserError {
   constructor(message: string) {
     super(message);
-    this.name = 'URLNotAllowedError';
+    this.name = "URLNotAllowedError";
   }
 }

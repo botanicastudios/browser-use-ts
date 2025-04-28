@@ -1,7 +1,7 @@
 /**
  * Extended browser context interfaces for TypeScript implementation
  */
-import { BrowserContext } from './context';
+import { BrowserContext } from "./context";
 
 /**
  * Extended interface for BrowserContext with additional methods
@@ -10,10 +10,10 @@ import { BrowserContext } from './context';
 export interface ExtendedBrowserContext extends BrowserContext {
   // Navigation methods
   goBack(): Promise<void>;
-  
+
   // Session methods
   getSession(): Promise<any>;
-  
+
   // DOM interaction methods
   getSelectorMap(): Promise<any>;
   getDomElementByIndex(index: number | string): Promise<any>;
@@ -22,7 +22,7 @@ export interface ExtendedBrowserContext extends BrowserContext {
   isFileUploader(element: any): Promise<boolean>;
   _clickElementNode(element: any): Promise<string | null>;
   _inputTextElementNode(element: any, text: string): Promise<void>;
-  
+
   // Tab management methods
   switchToTab(pageId: number): Promise<void>;
   createNewTab(url?: string): Promise<void>;

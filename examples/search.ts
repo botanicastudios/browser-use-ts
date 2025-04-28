@@ -2,13 +2,7 @@
  * Example of using the browser-use Agent with TypeScript
  * Based on the Python implementation at https://github.com/browser-use/browser-use/blob/main/examples/use-cases/captcha.py
  */
-import {
-  Agent,
-  Browser,
-  BrowserConfig,
-  BrowserContext,
-  BrowserContextConfig,
-} from "../src";
+import { Agent, Browser, BrowserConfig } from "../src";
 // Import LangChain components
 import { ChatOpenAI } from "@langchain/openai";
 // For loading environment variables, matching Python's dotenv

@@ -11,7 +11,11 @@ export class HashedDomElement {
   xpathHash: string;
   // textHash: string;
 
-  constructor(branchPathHash: string, attributesHash: string, xpathHash: string) {
+  constructor(
+    branchPathHash: string,
+    attributesHash: string,
+    xpathHash: string
+  ) {
     this.branchPathHash = branchPathHash;
     this.attributesHash = attributesHash;
     this.xpathHash = xpathHash;
@@ -71,7 +75,7 @@ export class ViewportInfo {
   scrollX: number;
   scrollY: number;
 
-  constructor(width: number, height: number, scrollX: number = 0, scrollY: number = 0) {
+  constructor(width: number, height: number, scrollX = 0, scrollY = 0) {
     this.width = width;
     this.height = height;
     this.scrollX = scrollX;
@@ -100,7 +104,7 @@ export class DOMHistoryElement {
     highlightIndex: number | null,
     entireParentBranchPath: string[],
     attributes: Record<string, string>,
-    shadowRoot: boolean = false,
+    shadowRoot = false,
     cssSelector: string | null = null,
     pageCoordinates: CoordinateSet | null = null,
     viewportCoordinates: CoordinateSet | null = null,
@@ -130,30 +134,66 @@ export class DOMHistoryElement {
       attributes: this.attributes,
       shadow_root: this.shadowRoot,
       css_selector: this.cssSelector,
-      page_coordinates: this.pageCoordinates ? {
-        top_left: { x: this.pageCoordinates.topLeft.x, y: this.pageCoordinates.topLeft.y },
-        top_right: { x: this.pageCoordinates.topRight.x, y: this.pageCoordinates.topRight.y },
-        bottom_left: { x: this.pageCoordinates.bottomLeft.x, y: this.pageCoordinates.bottomLeft.y },
-        bottom_right: { x: this.pageCoordinates.bottomRight.x, y: this.pageCoordinates.bottomRight.y },
-        center: { x: this.pageCoordinates.center.x, y: this.pageCoordinates.center.y },
-        width: this.pageCoordinates.width,
-        height: this.pageCoordinates.height
-      } : null,
-      viewport_coordinates: this.viewportCoordinates ? {
-        top_left: { x: this.viewportCoordinates.topLeft.x, y: this.viewportCoordinates.topLeft.y },
-        top_right: { x: this.viewportCoordinates.topRight.x, y: this.viewportCoordinates.topRight.y },
-        bottom_left: { x: this.viewportCoordinates.bottomLeft.x, y: this.viewportCoordinates.bottomLeft.y },
-        bottom_right: { x: this.viewportCoordinates.bottomRight.x, y: this.viewportCoordinates.bottomRight.y },
-        center: { x: this.viewportCoordinates.center.x, y: this.viewportCoordinates.center.y },
-        width: this.viewportCoordinates.width,
-        height: this.viewportCoordinates.height
-      } : null,
-      viewport_info: this.viewportInfo ? {
-        scroll_x: this.viewportInfo.scrollX,
-        scroll_y: this.viewportInfo.scrollY,
-        width: this.viewportInfo.width,
-        height: this.viewportInfo.height
-      } : null
+      page_coordinates: this.pageCoordinates
+        ? {
+            top_left: {
+              x: this.pageCoordinates.topLeft.x,
+              y: this.pageCoordinates.topLeft.y,
+            },
+            top_right: {
+              x: this.pageCoordinates.topRight.x,
+              y: this.pageCoordinates.topRight.y,
+            },
+            bottom_left: {
+              x: this.pageCoordinates.bottomLeft.x,
+              y: this.pageCoordinates.bottomLeft.y,
+            },
+            bottom_right: {
+              x: this.pageCoordinates.bottomRight.x,
+              y: this.pageCoordinates.bottomRight.y,
+            },
+            center: {
+              x: this.pageCoordinates.center.x,
+              y: this.pageCoordinates.center.y,
+            },
+            width: this.pageCoordinates.width,
+            height: this.pageCoordinates.height,
+          }
+        : null,
+      viewport_coordinates: this.viewportCoordinates
+        ? {
+            top_left: {
+              x: this.viewportCoordinates.topLeft.x,
+              y: this.viewportCoordinates.topLeft.y,
+            },
+            top_right: {
+              x: this.viewportCoordinates.topRight.x,
+              y: this.viewportCoordinates.topRight.y,
+            },
+            bottom_left: {
+              x: this.viewportCoordinates.bottomLeft.x,
+              y: this.viewportCoordinates.bottomLeft.y,
+            },
+            bottom_right: {
+              x: this.viewportCoordinates.bottomRight.x,
+              y: this.viewportCoordinates.bottomRight.y,
+            },
+            center: {
+              x: this.viewportCoordinates.center.x,
+              y: this.viewportCoordinates.center.y,
+            },
+            width: this.viewportCoordinates.width,
+            height: this.viewportCoordinates.height,
+          }
+        : null,
+      viewport_info: this.viewportInfo
+        ? {
+            scroll_x: this.viewportInfo.scrollX,
+            scroll_y: this.viewportInfo.scrollY,
+            width: this.viewportInfo.width,
+            height: this.viewportInfo.height,
+          }
+        : null,
     };
   }
 }
