@@ -1,5 +1,26 @@
 /**
- * TypeScript implementation of browser-use browser context
+ * Browser Context Module
+ *
+ * This module provides a browser context abstraction, representing an isolated browsing
+ * session within the browser-use architecture. Each context maintains its own cookies,
+ * localStorage, and session state, allowing for parallel browsing sessions.
+ *
+ * Key responsibilities:
+ * - Creating and managing isolated browsing sessions
+ * - Handling page navigation and interaction
+ * - Managing cookies, localStorage, and session data
+ * - Capturing DOM state and screenshots
+ * - Providing element selection and interaction capabilities
+ * - Handling navigation events and network requests
+ *
+ * The Browser service (in service.ts) uses this module to:
+ * - Create isolated browsing contexts for different tasks
+ * - Track and manage the state of each browsing session
+ * - Provide the Agent with access to the browser's current state
+ * - Execute actions on web pages through element selectors
+ *
+ * This module is a critical bridge between the high-level Agent commands and
+ * the low-level browser automation capabilities provided by Playwright.
  */
 
 import { v4 as uuidv4 } from "uuid";

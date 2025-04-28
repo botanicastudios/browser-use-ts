@@ -1,5 +1,23 @@
 /**
- * TypeScript implementation of browser-use controller registry views
+ * Controller Registry Views Module
+ *
+ * This module defines the registration system for browser actions in the browser-use
+ * architecture. It provides a structured way to register, discover, and describe
+ * actions that can be executed by the Controller.
+ *
+ * Key components:
+ * - RegisteredAction: Model for a single registered action with its metadata
+ * - ActionModel: Base model for dynamically created action representations
+ * - ActionRegistry: Container for all registered actions with discovery capabilities
+ *
+ * The Controller Registry service (in service.ts) uses these models to:
+ * - Register actions with their parameters and execution functions
+ * - Generate documentation for available actions in LLM prompts
+ * - Validate and process action requests from the Agent
+ * - Provide a dynamic action discovery mechanism for the Controller
+ *
+ * This registry pattern enables extensibility by allowing new actions to be
+ * registered with the system without modifying the core Controller logic.
  */
 
 /**

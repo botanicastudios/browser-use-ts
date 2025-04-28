@@ -1,4 +1,32 @@
 /**
+ * History Tree Processor - DOM Element Tracking
+ *
+ * This module tracks DOM elements across page changes and browser interactions,
+ * allowing the Agent to maintain references to elements even as the page updates.
+ *
+ * Responsibilities:
+ * - Creates unique fingerprints for DOM elements based on multiple attributes
+ * - Compares elements across page changes to identify the same element
+ * - Tracks element positions and attribute changes
+ * - Provides utilities to convert between DOM elements and history elements
+ * - Creates stable hashes based on element properties and context
+ *
+ * The History Tree Processor works by:
+ * 1. Creating hash-based fingerprints for elements based on:
+ *    - XPath
+ *    - Parent branch path (hierarchical position)
+ *    - Element attributes
+ * 2. Using these fingerprints to find matching elements after page updates
+ * 3. Tracking coordinates and other properties to enable stable references
+ *
+ * This is critical for maintaining continuity in the Agent's actions across
+ * dynamic page updates, AJAX loads, and other changes to the DOM.
+ *
+ * Child modules in this directory:
+ * - view: Data models for DOM history elements and coordinates
+ */
+
+/**
  * TypeScript implementation of browser-use DOM history tree processor service
  */
 

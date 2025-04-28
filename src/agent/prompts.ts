@@ -1,5 +1,23 @@
 /**
- * Prompts for the agent
+ * Agent Prompts Module
+ *
+ * This module provides the prompt templates and message formatting capabilities used by the Agent
+ * to communicate with LLMs. It's a critical component that defines how the Agent instructs
+ * the LLM to interpret browser state and generate appropriate actions.
+ *
+ * Key components:
+ * - SystemPrompt: Defines the core instruction set and capabilities for the Agent LLM
+ * - PlannerPrompt: Provides instructions for the planning component of the Agent
+ * - AgentMessagePrompt: Formats browser state into LLM-readable prompts with relevant context
+ *
+ * The Agent service (in service.ts) uses these prompts to:
+ * - Initialize the LLM with appropriate system instructions
+ * - Format browser state into structured messages for the LLM
+ * - Include visual information when using vision-capable LLMs
+ * - Provide appropriate context about available actions and current state
+ *
+ * The quality and structure of these prompts directly impact the Agent's ability to
+ * understand web pages and generate appropriate actions to accomplish user tasks.
  */
 import { SystemMessage } from "@langchain/core/messages";
 

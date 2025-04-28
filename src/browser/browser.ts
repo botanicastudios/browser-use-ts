@@ -1,5 +1,25 @@
 /**
- * TypeScript implementation of browser-use browser
+ * Browser Module
+ *
+ * This module is a core component of the browser-use architecture that provides the main
+ * browser abstraction layer. It serves as the foundation for browser automation by initializing
+ * and managing the browser instance that will be used for all web interactions.
+ *
+ * Key responsibilities:
+ * - Browser initialization and configuration
+ * - Managing browser launch options
+ * - Creating and tracking browser contexts
+ * - Providing navigation capabilities
+ * - Handling browser lifecycle (opening/closing)
+ *
+ * The Browser service (in service.ts) uses this module to:
+ * - Create and configure browser instances based on user requirements
+ * - Manage multiple browser contexts for isolated browsing sessions
+ * - Handle different browser types (chromium, firefox, webkit)
+ * - Connect to existing browser instances when needed
+ *
+ * This module implements the low-level browser interface using Playwright,
+ * abstracting the complexities of browser automation for the rest of the system.
  */
 
 import * as playwright from "playwright";

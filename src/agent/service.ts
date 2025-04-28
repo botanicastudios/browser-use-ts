@@ -1,4 +1,34 @@
 /**
+ * Agent Service - Core Component
+ *
+ * This module contains the central Agent class that orchestrates browser automation using LLMs.
+ * It serves as the main entry point and coordinator for the browser-use library.
+ *
+ * Responsibilities:
+ * - Manages the communication between the LLM and browser actions
+ * - Coordinates the execution of tasks through multiple steps
+ * - Handles state management, history tracking, and error recovery
+ * - Processes LLM outputs and converts them into actionable browser commands
+ *
+ * The Agent class connects to:
+ * - Controller: To execute browser actions
+ * - Browser/BrowserContext: To interact with the web browser
+ * - MessageManager: To manage conversation history and token limits
+ *
+ * The agent follows a step-based execution model where each step:
+ * 1. Gets the current browser state
+ * 2. Sends the state to the LLM
+ * 3. Receives actions to perform
+ * 4. Executes those actions
+ * 5. Records the results
+ *
+ * Child modules in this directory:
+ * - message_manager: Handles conversation history and token management
+ * - prompts: Contains system prompts and templates
+ * - views: Defines data models and types for the agent
+ */
+
+/**
  * Agent service for browser-use TypeScript implementation
  */
 // Langchain imports

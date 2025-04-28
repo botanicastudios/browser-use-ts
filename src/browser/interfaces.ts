@@ -1,5 +1,22 @@
 /**
- * Extended browser context interfaces for TypeScript implementation
+ * Browser Interfaces Module
+ *
+ * This module defines extended interfaces for the BrowserContext component, providing
+ * type definitions for additional capabilities required by the Controller. These
+ * interfaces ensure type safety and proper integration between the Browser and
+ * Controller components in the browser-use architecture.
+ *
+ * Key components:
+ * - ExtendedBrowserContext: Extends the BrowserContext with additional methods required
+ *   for DOM interaction, tab management, and navigation used by the Controller
+ *
+ * The Browser service (in service.ts) implements these interfaces to provide:
+ * - Comprehensive browser automation capabilities to the Controller
+ * - Type-safe interactions between components
+ * - Clear contract definition for browser context implementations
+ *
+ * This module bridges the gap between the core browser functionality and the
+ * higher-level actions required by the Controller component.
  */
 import { BrowserContext } from "./context";
 

@@ -28,14 +28,14 @@ Visit Amazon.com, search for a laptop under $1000, and find the best option base
 
 1. Navigate to Amazon.com
 2. Search for "laptop under $1000"
-3. Browse through the top 3 results
+3. Browse through the first page of results
 4. For each result:
    - Check the price, could be number starting with a currency symbol, might not have keyword "price"
    - Look at the average rating and number of reviews
    - Review the key specifications (processor, RAM, storage)
 5. Identify the best option based on:
    - Price-to-performance ratio
-   - Customer reviews
+   - Customer reviews (both rating and volume)
    - Specifications for general use
 6. Summarize your findings, including:
    - The best laptop you found
@@ -66,7 +66,7 @@ const agent = new Agent(
   task,
   new ChatOpenAI({
     openAIApiKey: process.env["OPENAI_API_KEY"] || "",
-    modelName: "gpt-4-turbo",
+    modelName: "gpt-4o",
     temperature: 0.1,
     maxTokens: 1500, // Increased tokens for potentially longer pages
   }),
@@ -74,6 +74,10 @@ const agent = new Agent(
   {
     // Pass the pre-configured browserContext via options
     browserContext: browserContext,
+    pageExtractionLlm: new ChatOpenAI({
+      openAIApiKey: process.env["OPENAI_API_KEY"] || "",
+      modelName: "gpt-4o-mini",
+    }),
     // Other options can be added here if needed, e.g.:
     // useVision: true,
     // maxFailures: 5

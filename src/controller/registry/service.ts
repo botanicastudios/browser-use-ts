@@ -1,4 +1,36 @@
 /**
+ * Registry Service - Action Registration System
+ *
+ * This module provides a registry system for browser actions that can be executed by the Agent.
+ * It manages the collection of available actions and their metadata.
+ *
+ * Responsibilities:
+ * - Registers browser actions with their descriptions and parameter models
+ * - Creates runtime validation for action parameters
+ * - Provides a mechanism to dynamically create action models for LLM function calling
+ * - Generates descriptions of available actions for inclusion in LLM prompts
+ * - Executes registered actions with proper parameter validation
+ *
+ * The Registry uses a decorator pattern to register actions:
+ * ```
+ * registry.action("Description of the action", ParameterModel)(
+ *   this, "action_name", {
+ *     value: async function(params, context) { ... },
+ *     ...
+ *   }
+ * )
+ * ```
+ *
+ * This creates a centralized collection of actions that:
+ * 1. Can be dynamically discovered by the Agent
+ * 2. Have consistent parameter validation
+ * 3. Can be easily extended with new actions
+ *
+ * Child modules in this directory:
+ * - views: Contains models for registered actions and action parameters
+ */
+
+/**
  * TypeScript implementation of browser-use controller registry
  */
 import { BrowserContext } from "../../browser/context";

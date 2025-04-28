@@ -1,5 +1,18 @@
 /**
- * Utility functions for the message manager
+ * Message Manager Utilities Module
+ *
+ * This module provides utility functions for the Message Manager component within the Agent architecture.
+ * The Message Manager is responsible for maintaining the conversation history between the Agent and LLM,
+ * formatting messages for LLM consumption, and ensuring token limits are respected.
+ *
+ * These utilities handle:
+ * - Extracting JSON from model outputs (handling both plain JSON and code-block-wrapped responses)
+ * - Converting input messages to formats compatible with different LLM providers
+ * - Merging successive messages to optimize token usage
+ * - Saving conversation history to files for debugging and analysis
+ *
+ * The MessageManager service (in service.ts) uses these utilities to process messages before
+ * sending them to the LLM and to handle the responses received from the LLM.
  */
 import * as fs from "fs";
 import * as path from "path";

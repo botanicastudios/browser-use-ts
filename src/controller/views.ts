@@ -1,5 +1,25 @@
 /**
- * TypeScript implementation of browser-use controller views
+ * Controller Views Module
+ *
+ * This module defines the parameter models for all browser actions supported by the
+ * Controller component in the browser-use architecture. These models provide
+ * structure and validation for the parameters passed to browser automation actions.
+ *
+ * Key action models include:
+ * - Navigation: GoToUrlAction, SearchGoogleAction
+ * - Element Interaction: ClickElementAction, InputTextAction, SelectDropdownOptionAction
+ * - Page Control: ScrollAction, WaitAction, ExtractPageContentAction
+ * - Tab Management: SwitchTabAction, OpenTabAction
+ * - Task Completion: DoneAction
+ *
+ * The Controller service (in service.ts) uses these models to:
+ * - Validate parameters received from the Agent
+ * - Provide schema information for LLM prompt generation
+ * - Define the structure of all available actions
+ * - Enable type safety for action execution
+ *
+ * These models form the foundation of the action execution system, defining
+ * the contract between the Agent's commands and the Controller's execution.
  */
 
 // Action Input Models

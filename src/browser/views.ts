@@ -1,5 +1,25 @@
 /**
- * TypeScript implementation of browser-use browser views
+ * Browser Views Module
+ *
+ * This module defines the data models and structures that represent browser state
+ * within the browser-use architecture. These models are used to capture, store, and
+ * communicate the current state of the browser to other components, especially the Agent.
+ *
+ * Key components:
+ * - BrowserState: Represents the complete state of a browser session including URL, title,
+ *   tabs, screenshots, and DOM state
+ * - BrowserStateHistory: Tracks the history of browser states for context and debugging
+ * - TabInfo: Represents information about browser tabs
+ * - BrowserError: Error classes for browser-related exceptions
+ *
+ * The Browser service (in service.ts) uses these models to:
+ * - Capture the current state of the browser at each step
+ * - Provide the Agent with a structured representation of the current page
+ * - Track the history of browser states for context
+ * - Communicate errors and exceptions in a structured way
+ *
+ * These models serve as a critical interface between the Browser component and
+ * the Agent, allowing the Agent to make informed decisions based on browser state.
  */
 
 import {

@@ -1,5 +1,24 @@
 /**
- * TypeScript implementation of browser-use DOM history tree processor views
+ * DOM History Tree Processor Views Module
+ *
+ * This module defines the data models for tracking and processing DOM elements across
+ * page changes in the browser-use architecture. It provides the structures needed to
+ * identify and match elements even when the page is updated or navigated.
+ *
+ * Key components:
+ * - HashedDomElement: Provides hash-based fingerprinting for stable element identification
+ * - Coordinates/CoordinateSet: Represent element positions on the page and viewport
+ * - ViewportInfo: Captures browser viewport state for element positioning
+ * - DOMHistoryElement: Represents historical DOM elements with tracking information
+ *
+ * The History Tree Processor service (in service.ts) uses these models to:
+ * - Track elements across page changes using multiple identification strategies
+ * - Hash element attributes and properties for fingerprinting
+ * - Maintain stable references to elements for interaction
+ * - Compare current elements with historical elements to find matches
+ *
+ * This module is critical for maintaining continuity of element references as the
+ * browser navigates between pages or as dynamic content updates the DOM structure.
  */
 
 /**

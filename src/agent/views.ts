@@ -1,3 +1,27 @@
+/**
+ * Agent Views Module
+ *
+ * This module defines the core data models and structures used throughout the Agent architecture.
+ * It serves as the foundation for representing the Agent's state, settings, history, and outputs,
+ * enabling the Agent to track progress, make decisions, and maintain context across steps.
+ *
+ * Key components:
+ * - AgentSettings: Configuration options for the Agent
+ * - AgentState: Tracks the Agent's runtime state including steps, failures, and history
+ * - AgentOutput/DoneAgentOutput: Structured output from the LLM with actions to execute
+ * - AgentHistory: Record of past actions, results, and browser states
+ * - ActionResult: Results of executing actions on the browser
+ *
+ * The Agent service (in service.ts) uses these models to:
+ * - Maintain stateful execution across multiple interaction steps
+ * - Track the history of actions and results for context
+ * - Parse and validate LLM outputs before execution
+ * - Configure Agent behavior (vision, planning, validation, etc.)
+ * - Handle errors and failures with appropriate recovery strategies
+ *
+ * This module serves as the central data structure hub for the Agent component,
+ * facilitating communication between all other components in the system.
+ */
 import { v4 as uuidv4 } from "uuid";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { ActionModel } from "../controller/registry/views";

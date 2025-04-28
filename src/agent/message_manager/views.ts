@@ -1,3 +1,23 @@
+/**
+ * Message Manager Views Module
+ *
+ * This module defines the data models and structures used by the Message Manager component
+ * within the Agent architecture. The Message Manager is responsible for maintaining the
+ * conversation history between the Agent and LLM, managing token usage, and ensuring
+ * proper formatting of messages.
+ *
+ * Key components in this module:
+ * - MessageMetadata: Tracks metadata for messages (e.g., token count)
+ * - ManagedMessage: Wraps LangChain messages with metadata
+ * - MessageHistory: Maintains an efficient history of messages with token tracking
+ * - MessageManagerState: Holds the state for the MessageManager service
+ *
+ * The MessageManager service (in service.ts) uses these models to:
+ * - Track and limit token usage to stay within model context windows
+ * - Maintain conversation history with proper metadata
+ * - Serialize and deserialize message history for persistence
+ * - Manage tool responses and ensure proper message sequencing
+ */
 import {
   AIMessage,
   BaseMessage,

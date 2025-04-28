@@ -1,5 +1,24 @@
 /**
- * Controller type definitions
+ * Controller Types Module
+ *
+ * This module defines the core type definitions used throughout the Controller component
+ * of the browser-use architecture. The Controller is responsible for executing browser
+ * actions based on commands from the Agent.
+ *
+ * Key components:
+ * - Context: Interface for the execution context of actions
+ * - ActionParams: Interface for parameters passed to actions
+ * - ActionResponse: Interface for structured responses from actions
+ * - ActionResult: Class representing the result of executing an action
+ *
+ * The Controller service (in service.ts) uses these types to:
+ * - Define a consistent interface for all actions
+ * - Process and validate action parameters
+ * - Format action results in a standardized way
+ * - Provide structured feedback to the Agent about action execution
+ *
+ * These types create a consistent contract between the Agent and Controller components,
+ * enabling structured communication about actions and their results.
  */
 
 export interface Context {

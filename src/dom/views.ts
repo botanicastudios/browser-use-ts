@@ -1,5 +1,26 @@
 /**
- * TypeScript implementation of browser-use DOM views
+ * DOM Views Module
+ *
+ * This module defines the data models and structures for representing DOM elements
+ * within the browser-use architecture. It provides a comprehensive object model that
+ * captures the essential properties of web page elements for processing and interaction.
+ *
+ * Key components:
+ * - ViewportInfo: Information about the browser viewport dimensions and scroll position
+ * - DOMBaseNode: Abstract base class for all DOM nodes
+ * - DOMElementNode: Represents an element node with its attributes and properties
+ * - DOMTextNode: Represents a text node within the DOM
+ * - DOMHistoryElement: Simplified element representation for history tracking
+ * - DOMState: Container for the current state of the DOM
+ *
+ * The DOM service (in service.ts) uses these models to:
+ * - Create a structured representation of web pages for the Agent
+ * - Process and filter DOM elements for interactive capabilities
+ * - Track elements across page changes for stable interactions
+ * - Generate string representations of the DOM for LLM consumption
+ *
+ * These models form the bridge between the raw browser DOM and the structured
+ * representation needed by the Agent to understand and interact with web pages.
  */
 
 /**

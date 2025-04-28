@@ -1,3 +1,28 @@
+/**
+ * Message Manager Service - Conversation History Manager
+ *
+ * This module manages the conversation history between the Agent and the LLM,
+ * handling token counting, message formatting, and history pruning.
+ *
+ * Responsibilities:
+ * - Maintains the conversation history in a structured format
+ * - Tracks token usage to prevent exceeding LLM context limits
+ * - Formats browser state and action results into LLM-friendly messages
+ * - Prunes history when token limits are approached
+ * - Manages system prompts, task descriptions, and other message types
+ * - Filters sensitive data from messages
+ *
+ * The MessageManager acts as a specialized conversation buffer that:
+ * 1. Adds messages with proper structure and metadata
+ * 2. Estimates token counts for messages
+ * 3. Removes or truncates messages when necessary to stay within token limits
+ * 4. Formats different types of content (text, images, tool calls) consistently
+ *
+ * Child modules in this directory:
+ * - utils: Helper functions for message processing
+ * - views: Data models for message state and metadata
+ */
+
 import {
   AIMessage,
   BaseMessage,

@@ -1,4 +1,33 @@
 /**
+ * Controller Service - Browser Actions Executor
+ *
+ * This module serves as the bridge between agent commands and browser interactions.
+ * It contains the Controller class which implements all available browser actions.
+ *
+ * Responsibilities:
+ * - Defines and registers available browser actions
+ * - Executes actions requested by the Agent
+ * - Validates action parameters
+ * - Formats action results for the Agent to process
+ * - Handles common browser operations (click, input, navigate, scroll, etc.)
+ *
+ * The Controller uses a registry pattern where actions are registered with:
+ * - A human-readable description
+ * - A parameter model for validation
+ * - An implementation function
+ *
+ * Each action:
+ * 1. Receives parameters and context (browser, LLM, etc.)
+ * 2. Performs the requested operation
+ * 3. Returns an ActionResult with the outcome
+ *
+ * Child modules in this directory:
+ * - registry: Manages the registration and retrieval of available actions
+ * - views: Defines parameter models and types for actions
+ * - types: Contains interfaces and types used by the controller
+ */
+
+/**
  * TypeScript implementation of browser-use controller service
  */
 import { ActionResult } from "./types";

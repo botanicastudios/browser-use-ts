@@ -1,4 +1,33 @@
 /**
+ * DOM Service - Web Page Element Processing
+ *
+ * This module analyzes web pages to identify and represent interactive elements
+ * that can be manipulated by the Agent.
+ *
+ * Responsibilities:
+ * - Extracts interactive elements (buttons, links, inputs, etc.) from web pages
+ * - Creates a structured representation of the DOM with element hierarchies
+ * - Computes visibility, interactivity, and positioning of elements
+ * - Builds selector maps that connect element indexes to DOM nodes
+ * - Provides viewport information to help the Agent understand page layout
+ * - Highlights elements in the browser for visual feedback
+ *
+ * The DOM service works by:
+ * 1. Injecting JavaScript into the page to analyze the DOM
+ * 2. Building a tree of elements with their properties and relationships
+ * 3. Computing unique identifiers and selectors for each interactive element
+ * 4. Calculating position and visibility information
+ *
+ * This module provides the foundation for the Agent to "see" and interact with web pages,
+ * serving as the eyes and spatial awareness system of the browser automation.
+ *
+ * Child modules in this directory:
+ * - views: Data models for DOM elements and node structures
+ * - history_tree_processor: Tracks and compares DOM elements across page changes
+ * - buildDomTree.js: Client-side JavaScript that analyzes the DOM in the browser
+ */
+
+/**
  * TypeScript implementation of browser-use DOM service
  */
 
