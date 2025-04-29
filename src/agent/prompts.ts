@@ -276,6 +276,7 @@ ${stepInfoDescription}
     }
 
     if (this.state.screenshot && useVision) {
+      // The screenshot already includes the appropriate data URI prefix based on format
       // Format message for vision model
       return new HumanMessage({
         content: [
@@ -283,7 +284,7 @@ ${stepInfoDescription}
           {
             type: "image_url",
             image_url: {
-              url: `data:image/png;base64,${this.state.screenshot}`,
+              url: this.state.screenshot,
               detail: "low",
             },
           },

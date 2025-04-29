@@ -78,6 +78,7 @@ export interface IAgentSettings {
   pageExtractionLlm: BaseChatModel | null;
   plannerLlm: BaseChatModel | null;
   plannerInterval: number;
+  screenshotFormat: "png" | "jpeg";
 }
 
 // AgentSettings schema as a plain JavaScript object
@@ -129,6 +130,11 @@ export const AgentSettingsSchema = {
     pageExtractionLlm: { type: ["object", "null"], default: null },
     plannerLlm: { type: ["object", "null"], default: null },
     plannerInterval: { type: "number", default: 1 },
+    screenshotFormat: {
+      type: "string",
+      enum: ["png", "jpeg"],
+      default: "png",
+    },
   },
   required: [
     "useVision",
@@ -138,6 +144,7 @@ export const AgentSettingsSchema = {
     "validateOutput",
     "includeAttributes",
     "maxActionsPerStep",
+    "screenshotFormat",
   ],
 };
 
@@ -175,6 +182,7 @@ export class AgentSettings implements IAgentSettings {
   pageExtractionLlm: BaseChatModel | null = null;
   plannerLlm: BaseChatModel | null = null;
   plannerInterval = 1; // Run planner every N steps
+  screenshotFormat: "png" | "jpeg" = "png"; // Default to PNG format
 
   static schema = AgentSettingsSchema;
 

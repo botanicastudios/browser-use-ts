@@ -98,6 +98,7 @@ export interface AgentConstructorOptions<Context = any> {
   saveConversationPath?: string;
   useVisionForPlanner?: boolean;
   useVision?: boolean;
+  screenshotFormat?: "png" | "jpeg";
   registerExternalAgentStatusRaiseErrorCallback?: () => Promise<boolean>;
   registerNewStepCallback?: (
     state: BrowserState,
@@ -239,6 +240,7 @@ export class Agent<Context = any> {
       saveConversationPath,
       useVisionForPlanner = false,
       useVision = true,
+      screenshotFormat,
       registerExternalAgentStatusRaiseErrorCallback = async () => false,
       registerNewStepCallback = async () => Promise.resolve(),
       registerDoneCallback = async () => Promise.resolve(),
@@ -278,6 +280,7 @@ export class Agent<Context = any> {
     this.settings.pageExtractionLlm = finalPageExtractionLlm;
     this.settings.plannerLlm = plannerLlm || null;
     this.settings.plannerInterval = plannerInterval;
+    this.settings.screenshotFormat = screenshotFormat || "png";
 
     // Initialize state
     this.state = injectedAgentState || new AgentState();

@@ -45,7 +45,13 @@ Visit Amazon.com, search for a laptop under $1000, and find the best option base
 `;
 
 // Create Browser instance first
-const browserInstance = new Browser(new BrowserConfig({ headless: false }));
+const browserInstance = new Browser(
+  new BrowserConfig({
+    headless: false,
+    executablePath:
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  })
+);
 
 // Configure BrowserContext
 const browserContextConfig = new BrowserContextConfig({
@@ -67,17 +73,17 @@ const agent = new Agent(
   new ChatOpenAI({
     openAIApiKey: process.env["OPENAI_API_KEY"] || "",
     modelName: "gpt-4o",
-    temperature: 0.1,
-    maxTokens: 1500, // Increased tokens for potentially longer pages
   }),
   // All other positional arguments moved to options
   {
     // Pass the pre-configured browserContext via options
-    browserContext: browserContext,
+    browser: browserInstance,
+    //browserContext: browserContext,
     pageExtractionLlm: new ChatOpenAI({
       openAIApiKey: process.env["OPENAI_API_KEY"] || "",
       modelName: "gpt-4o-mini",
     }),
+    screenshotFormat: "jpeg",
     // Other options can be added here if needed, e.g.:
     // useVision: true,
     // maxFailures: 5

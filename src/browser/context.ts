@@ -26,7 +26,8 @@
 import { v4 as uuidv4 } from "uuid";
 import { BrowserState, TabInfo } from "./views";
 import { Browser } from "./browser";
-import { Page } from "playwright";
+//import { Page } from "playwright";
+import { Page } from "patchright";
 import { DOMService } from "../dom/service";
 import { SelectorMap } from "../dom/views";
 import * as fs from "fs";
@@ -671,7 +672,8 @@ export class BrowserContext {
         this.config.viewportExpansion
       );
 
-      // Take screenshot
+      // Take screenshot with default PNG format
+      // The agent will handle format conversion if needed when processing the state
       const screenshot = await this._takeScreenshot();
 
       // Get scroll info
@@ -1025,15 +1027,16 @@ export class BrowserContext {
   }
 
   /**
-   * Take screenshot
-   */
-  /**
    * Takes a screenshot of the current page
    * Exact match to Python implementation's take_screenshot method
    * @param fullPage Whether to take a screenshot of the full page or just the viewport
-   * @returns Base64 encoded screenshot
+   * @param type The image format type (png or jpeg)
+   * @returns Base64 encoded screenshot with data URI prefix
    */
-  async takeScreenshot(fullPage = false): Promise<string> {
+  async takeScreenshot(
+    fullPage = false,
+    type: "png" | "jpeg" = "png"
+  ): Promise<string> {
     const page = await this.getCurrentPage();
 
     await page.bringToFront();
@@ -1042,23 +1045,29 @@ export class BrowserContext {
     const screenshot = await page.screenshot({
       fullPage,
       animations: "disabled",
+      type,
     });
 
     const screenshotB64 = Buffer.from(screenshot).toString("base64");
 
-    // await this.removeHighlights();
-    // Note: This line is commented out in the Python implementation
+    // Add the appropriate data URI prefix based on the screenshot format
+    const dataUriPrefix =
+      type === "jpeg" ? "data:image/jpeg;base64," : "data:image/png;base64,";
 
-    return screenshotB64;
+    // Return the screenshot with the data URI prefix
+    return `${dataUriPrefix}${screenshotB64}`;
   }
 
   /**
    * Internal method for taking screenshots
    * @private
    */
-  async _takeScreenshot(fullPage = false): Promise<string | undefined> {
+  async _takeScreenshot(
+    fullPage = false,
+    type: "png" | "jpeg" = "png"
+  ): Promise<string | undefined> {
     try {
-      return await this.takeScreenshot(fullPage);
+      return await this.takeScreenshot(fullPage, type);
     } catch (error) {
       console.error("Error taking screenshot:", error);
       return undefined;

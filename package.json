@@ -46,6 +46,7 @@
     "dotenv": "^16.4.7",
     "langchain": "^0.3.19",
     "node-fetch": "^2.6.7",
+    "patchright": "^1.52.0",
     "playwright": "^1.32.0",
     "turndown": "^7.2.0",
     "uuid": "^9.0.1"

@@ -22,7 +22,9 @@
  * abstracting the complexities of browser automation for the rest of the system.
  */
 
-import * as playwright from "playwright";
+//import * as playwright from "playwright";
+import * as playwright from "patchright";
+
 import { BrowserContext, BrowserContextConfig } from "./context";
 import { isValidUrl } from "../utils";
 
@@ -181,11 +183,12 @@ export class Browser {
    */
   async takeScreenshot(
     path: string,
-    context?: BrowserContext
+    context?: BrowserContext,
+    type?: "png" | "jpeg"
   ): Promise<Buffer> {
     const ctx = context || (await this.newContext());
     const page = await ctx.getCurrentPage();
-    return await page.screenshot({ path });
+    return await page.screenshot({ path, type });
   }
 
   /**
